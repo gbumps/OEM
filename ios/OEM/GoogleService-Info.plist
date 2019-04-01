@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>244083668959-khv8oa0qtjs15dhib02vdm088qk2hn2h.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.244083668959-khv8oa0qtjs15dhib02vdm088qk2hn2h</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB4Ocbo_20tgeEUAcKoq4GW4I9Dcawf9jI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>244083668959</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.dfk.oem</string>
+	<key>PROJECT_ID</key>
+	<string>outdoor-management-servi-8ca4e</string>
+	<key>STORAGE_BUCKET</key>
+	<string>outdoor-management-servi-8ca4e.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false></false>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:244083668959:ios:7d7b493cf57c0f69</string>
+	<key>DATABASE_URL</key>
+	<string>https://outdoor-management-servi-8ca4e.firebaseio.com</string>
+</dict>
+</plist>

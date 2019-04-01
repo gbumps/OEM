@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "244083668959",
+    "firebase_url": "https://outdoor-management-servi-8ca4e.firebaseio.com",
+    "project_id": "outdoor-management-servi-8ca4e",
+    "storage_bucket": "outdoor-management-servi-8ca4e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244083668959:android:7d7b493cf57c0f69",
+        "android_client_info": {
+          "package_name": "com.dfk.oem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "244083668959-g0pdo0fmumm0nrtvqmc9qt3jr2bh2cmh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRMFZMmGTHaJCBPQBXT8BuBP1Ic0idrG8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
