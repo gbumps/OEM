@@ -4,19 +4,19 @@ import {
   StyleSheet,
   Text,
   AsyncStorage, 
-  TouchableOpacity
  } from "react-native";
-import MapView, {PROVIDER_GOOGLE, Marker, Callout}  from "react-native-maps";
+import MapView, {PROVIDER_GOOGLE, Marker, Callout} from "react-native-maps";
 import { DEVICE_HEIGHT, DEVICE_WIDTH, baseColor } from "../../constants/mainSetting";
+import { TOKEN, CONTENT_TYPE, AUTHORIZATION, USER, ZONE_TIME, RED, HOUR_FORMAT } from "../../constants/common";
+import { COMPANY_INFO_SCREEN, MAP_SCREEN } from "../../constants/screen";
+
 import autobind from "class-autobind";
 import { requestTodayTaskLocation } from "../../apis/taskAPI";
 import moment from "moment";
 import axios from "axios";
-import { TOKEN, CONTENT_TYPE, AUTHORIZATION, USER, GREEN, ZONE_TIME, RED, HOUR_FORMAT } from "../../constants/common";
 import { Navigation } from "react-native-navigation";
-import { COMPANY_INFO_SCREEN, MAP_SCREEN } from "../../constants/screen";
 
-
+import mapStyle from "./mapStyle";
 
 export default class Maps extends Component {
   
@@ -127,24 +127,39 @@ export default class Maps extends Component {
   }
    
 
-  _renderMarker(list) {
-    let listMarkers = [], listStartTimeCompare = []
-    Object.keys(list).map((key) => {
-      let t = this._compareTimeToCurrent(list[key].list[0].startTime)
-      if (t > 0) {
-        listStartTimeCompare.push(t)
+  _renderMarker(listMark) {
+    console.log('maker: ',listMark)
+    let listMarkers = [], listMarkColorByTime = [], endTimePrevious = 0
+    Object.keys(listMark).map((key,index) => {
+      let endPos = listMark[key].list.length - 1
+      //console.log('time: ', time)
+      //console.log('list: ', listMark[key].list[0].startTime)
+      let startTimeAtCompany = listMark[key].list[0].startTime,
+          endTimeAtCompany = listMark[key].list[endPos].endTime,
+          timeDiffFromStartTime = this._compareTimeToCurrent(startTimeAtCompany),
+          timeDiffFromEndTime = this._compareTimeToCurrent(endTimeAtCompany),
+          timeDiffFromPreEndtime = (endTimePrevious !== 0) ? this._compareTimeToCurrent(endTimePrevious) : 0
+      console.log('time diff of com ' + index, timeDiffFromStartTime, timeDiffFromEndTime )
+      if (
+          (timeDiffFromStartTime < 0 && timeDiffFromEndTime > 0) ||  // start < current < end
+          (timeDiffFromStartTime > 0 && timeDiffFromPreEndtime <= 0) // 0 <= current < start or preEnd < current < start
+         ) {
+        listMarkColorByTime.push(baseColor)
       }
+      else {
+        listMarkColorByTime.push(RED)
+      }
+      endTimePrevious = endTimeAtCompany
     })
-    Object.keys(list).map((key,index) => {
-      let listViewTaskInfo = this._renderListTask(list[key].list)
-      let time = this._compareTimeToCurrent(list[key].list[0].startTime)
+    Object.keys(listMark).map((key,index) => {
+      let listViewTaskInfo = this._renderListTask(listMark[key].list)
       listMarkers.push(
         <Marker
-          pinColor={(time === Math.min.apply(Math,listStartTimeCompare)) ? baseColor : RED }
+          pinColor={listMarkColorByTime[index]}
           key={index}
           coordinate={{ 
-            latitude: list[key].latitude,
-            longitude: list[key].longitude
+            latitude: listMark[key].latitude,
+            longitude: listMark[key].longitude
           }}
           tracksViewChanges={false}
           showsMyLocationButton={true}>
@@ -157,18 +172,18 @@ export default class Maps extends Component {
                  id: COMPANY_INFO_SCREEN.id,
                  name: COMPANY_INFO_SCREEN.settingName,
                  passProps: {
-                   companyId: list[key].companyId, 
-                   listTasks: list[key].list
+                   companyId: listMark[key].companyId, 
+                   listTasks: listMark[key].list
                  },
                }
               })
             }}>
                 <View style={styles.taskInfoContainer}>
-                  <Text style={styles.textCompanyName}>{list[key].companyName}</Text> 
+                  <Text style={styles.textCompanyName}>{listMark[key].companyName}</Text> 
                   <Text style={styles.textLocationName}>{ 
-                    list[key].address.length >= 35 ? 
-                    list[key].address.substring(0, 34) + "..." 
-                     : list[key].address
+                    listMark[key].address.length >= 35 ? 
+                    listMark[key].address.substring(0, 34) + "..." 
+                     : listMark[key].address
                    }</Text>
                   <View style={{ justifyContent: "space-between" }}>
                      {listViewTaskInfo}
@@ -243,60 +258,3 @@ const styles = StyleSheet.create({
     backgroundColor: "white"
   }
 });
-
-const mapStyle = [
-  {
-    "featureType": "administrative.land_parcel",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.locality",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.neighborhood",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.business",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.sports_complex",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "transit.station",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  }
-]

@@ -28,10 +28,10 @@ import {
   ABSENT, AUTHORIZATION, 
   CONTENT_TYPE, TASK_WAITING_FOR_APPROVE, 
   HOUR_FORMAT, 
-  USER,
-  PHONENUMBER,
-  SESSION_EXPIRE_TIME
 } from "../../constants/common";
+import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSetting";
+import { NOTIFICATION, CHECK_ATTEND_SUCESSFUL,  ERR_SERVER_ERROR } from "../../constants/alert";
+
 import autobind from "class-autobind";
 import { 
   requestTodayTaskURL, 
@@ -41,11 +41,8 @@ import {
 import axios from "axios";
 import BackgroundTimer from "react-native-background-timer";
 import TaskTodayView from "./taskToday";
-import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSetting";
-import { NOTIFICATION, CHECK_ATTEND_SUCESSFUL,  ERR_SERVER_ERROR } from "../../constants/alert";
 import TaskUpcomingView from "./taskUpcoming";
 import firebase from "../../../firebase";
-import { checkSession } from "../../functions/functions";
 
 const YELLOW_ORANGE = "#ffa500"
       
@@ -279,15 +276,15 @@ class TaskEmployee extends Component {
 
   _compareTimeToCurrent(time) { 
     var current = moment(new Date()),
-        timeM = moment(new Date(time.replace(ZONE_TIME,"Z"))),
+        timeM = moment(time),
         differenceInMs = timeM.diff(current ,"minutes")
-        // console.log('time pass: ', time)
-        // console.log('current time: ', current)
-        // console.log('moment time: ', timeM)
+        console.log('current time: ', current.toString())
+        console.log('moment time: ', timeM.toString())
+        console.log('different in ms: ', differenceInMs)
     return differenceInMs
   }
 
-  _removeTaskCheckedAttendance(){
+  async _removeTaskCheckedAttendance(){
    //console.log('remove: list checked before remove',this.state.listCheckedAttendance)
      this.state.listTaskNotStart.forEach((task,index,arrayNotStart) => {
         if (this.state.listCheckedAttendance.includes(task)) {
@@ -298,7 +295,7 @@ class TaskEmployee extends Component {
      this.state.listCheckedAttendance = []
 
      if(this.state.listTaskNotStart.length === 0){
-      Beacons.stopRangingBeaconsInRegion("iBeacons") 
+      await Beacons.stopRangingBeaconsInRegion("iBeacons") 
       console.log('da dong gate do list not start empty')
     }
     console.log('remove : list not start after removed',this.state.listTaskNotStart)
@@ -308,6 +305,7 @@ class TaskEmployee extends Component {
   if(listWaitCheckAttendance.length > 0) {
     Beacons.detectIBeacons()
     try {
+      console.log('Enter beacon check !')
       await Beacons.startRangingBeaconsInRegion('iBeacons')
       //console.log(`Beacons ranging started succesfully!`)
       DeviceEventEmitter.addListener('beaconsDidRange', data => {
@@ -349,7 +347,7 @@ class TaskEmployee extends Component {
     //await DeviceEventEmitter.emit('beaconsDidRange')
     //DeviceEventEmitter.removeListener('beaconsDidRange')
     console.log('gate closed')
-    Beacons.stopRangingBeaconsInRegion("iBeacons")
+    await Beacons.stopRangingBeaconsInRegion("iBeacons")
   }}
 
   _renderTodayTask() {

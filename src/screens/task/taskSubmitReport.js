@@ -8,7 +8,6 @@ import {
   Alert,
   AsyncStorage,
   StyleSheet,
-  ListView
  } from "react-native";
 import { CheckBox  } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome"
@@ -23,10 +22,11 @@ import {
   CAMERA_SCREEN, 
   TASK_SCREEN, 
   LOADING_SCREEN,
-  TASK_REPORT_PROBLEM_SCREEN, 
 } from "../../constants/screen";
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/mainSetting";
-import { TOKEN, USER, YES, NO, AUTHORIZATION, PLACEHOLDER_DESCRIPTION, TASK_IN_PROGRESS_TEMP_ID, TASK_REPORT_PROBLEM_TEMP, TASK_REPORT_WORK_TEMP, TASK_REPORT_WORK_DESCRIPTION_TEMP, TASK_REPORT_PROBLEM_DESCRIPTION_TEMP, REPORT_PROBLEM, REPORT_TASK } from "../../constants/common";
+import { 
+  TOKEN, 
+  USER, YES, NO, AUTHORIZATION, PLACEHOLDER_DESCRIPTION, TASK_IN_PROGRESS_TEMP_ID, TASK_REPORT_PROBLEM_TEMP, TASK_REPORT_WORK_TEMP, TASK_REPORT_WORK_DESCRIPTION_TEMP, TASK_REPORT_PROBLEM_DESCRIPTION_TEMP, REPORT_PROBLEM, REPORT_TASK, END_TASK, REPORT_PROBLEM_NAME } from "../../constants/common";
 import { 
   NOTIFICATION, 
   MAX_FILE_LIMIT, 
@@ -41,7 +41,7 @@ import {
 
 const GREEN = "#00a86a"
 
-const listSuggestDesriptions = [
+const listSuggestDescriptions = [
   "Tôi đã hoàn thành công việc",
   "Tôi có vấn đề này",
   "Khác"
@@ -57,7 +57,7 @@ class TaskSubmitReport extends Component {
      description: "",
      reportType: "",
      taskCheckList: [],
-     textEditable: false,
+     editable: false,
      reportFunctionsView: "flex"
    }
   //  this._submitReport = this._submitReport.bind(this)
@@ -268,7 +268,7 @@ class TaskSubmitReport extends Component {
     return( 
       <View style={styles.container}>
         <TextInput style={styles.textDescription}
-          editable= { this.state.textEditable }
+          editable= { this.state.editable }
           onChangeText={(text) => {
             this.setState({
               description: text
@@ -279,14 +279,23 @@ class TaskSubmitReport extends Component {
         />
         <View> 
           {
-            listSuggestDesriptions.map((t,i) => {
+            listSuggestDescriptions.map((t,i) => {
               return (
                 <CheckBox containerStyle={styles.checkBoxContainer} 
                   title={t}
                   onPress={() => {
-                    this.setState({
-                      description: t
-                    })
+                    if (t == listSuggestDescriptions[2]) {
+                      this.setState({
+                        editable: true,
+                        description: "" 
+                      })
+                    }
+                    else {
+                      this.setState({
+                        editable: false,
+                        description: t
+                      })
+                    }
                   }} 
                   checkedIcon="dot-circle-o"
                   uncheckedIcon="circle-o">
@@ -315,23 +324,17 @@ class TaskSubmitReport extends Component {
                   }}/>
                 )) }
           </ScrollView>
-          <View style={{
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              flexDirection: "row",
-              display: this.state.reportFunctionsView
-            }}> 
+          <View style={[{ display: this.state.reportFunctionsView
+            }, styles.reportFunctionView]}> 
             <View style={styles.cameraBtnComponent}>
-            <TouchableOpacity onPress={
-              this._handlePressCamera
-            }>
+            <TouchableOpacity onPress={ this._handlePressCamera }>
               <Icon name="camera" size={30} color="white" />
             </TouchableOpacity>
             </View>
             <View style={styles.endButton}>
               <TouchableOpacity onPress={this._handleSubmitReport}> 
                 <Text style={{color: "white", fontSize: 20}}>
-                  {this.state.reportType === 1 ? "KẾT THÚC": "BÁO CÁO VẤN ĐỀ"} 
+                  {this.state.reportType === 1 ? END_TASK : REPORT_PROBLEM_NAME} 
                 </Text>
               </TouchableOpacity> 
               </View>
@@ -342,6 +345,11 @@ class TaskSubmitReport extends Component {
 }
 
 const styles = StyleSheet.create({
+  reportFunctionView: {
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    flexDirection: "row",
+  },
   checkBoxContainer: {
     backgroundColor: 'white',
     borderWidth: 0, 

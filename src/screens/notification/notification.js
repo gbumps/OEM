@@ -21,7 +21,10 @@ import {
   CONTENT_TYPE, 
   AUTHORIZATION, 
   TOKEN, USER, 
-  GREY, YELLOW_ORANGE, MINUTES_DAY, DEFAULT_PAGE_NOTIFICATION, MAXIMUM_NOTIFICATION_UPDATE, } from "../../constants/common";
+  GREY, YELLOW_ORANGE, 
+  MINUTES_DAY, DEFAULT_PAGE_NOTIFICATION, 
+  MAXIMUM_NOTIFICATION_UPDATE, 
+} from "../../constants/common";
 import { DEVICE_HEIGHT, baseColor } from "../../constants/mainSetting";
 import { ERR_INTERNET_CONNECTION, ERR_SERVER_ERROR } from "../../constants/alert";
 import firebase from "../../../firebase";
@@ -156,7 +159,7 @@ class Notification extends Component {
     if (time === 0) {
       time = today.diff(moment(dateReceived), "hours") 
       if (time > 0) return time + " h"
-      else return today.diff(moment(dateReceived), "minutes") + "phút"
+      else return today.diff(moment(dateReceived), "minutes") + " phút"
     } 
     return time + " ngày"
   }
@@ -219,7 +222,7 @@ class Notification extends Component {
     if (this.state.unseenCount === 0) {
       Navigation.mergeOptions(NOTIFICATION_SCREEN.id, {
           bottomTab: {
-            
+            badge: "",
           }
         })
       } 
