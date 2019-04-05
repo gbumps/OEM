@@ -168,6 +168,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation project(':react-native-exit-app')
     implementation (project(':react-native-maps')){
        exclude group: 'com.google.android.gms', module: 'play-services-base'
        exclude group: 'com.google.android.gms', module: 'play-services-maps'

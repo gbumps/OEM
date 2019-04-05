@@ -56,6 +56,13 @@ export const SESSION_EXPIRE_TIME = "SESSION_EXPIRE_TIME"
 export const END_TASK = "KẾT THÚC"
 export const REPORT_PROBLEM_NAME = "BÁO CÁO VẤN ĐỀ"
 
+export const BEACON_DID_RANGE = "beaconsDidRange"
+export const IBEACONS = "iBeacons"
+
+export const HELLO_WELCOME_TO_OEM = "Chào mừng đến với OEM"
+export const HELLO_INPUT_PASSWORD_TO_CONTINUE = "Đăng nhập để bắt đầu làm việc"
+export const HELLO_HAVE_A_NICE_DAY = "Chúc bạn có một ngày làm việc vui vẻ !"
+
 export const YELLOW_ORANGE = "#ffa500"
 export const GREY = "#afafaf"
 export const GREEN = "#06a86a"

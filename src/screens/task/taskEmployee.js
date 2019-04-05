@@ -27,10 +27,12 @@ import {
   IOS, TASK_COMPLETED, 
   ABSENT, AUTHORIZATION, 
   CONTENT_TYPE, TASK_WAITING_FOR_APPROVE, 
-  HOUR_FORMAT, 
+  HOUR_FORMAT,
+  BEACON_DID_RANGE,
+  IBEACONS, 
 } from "../../constants/common";
 import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSetting";
-import { NOTIFICATION, CHECK_ATTEND_SUCESSFUL,  ERR_SERVER_ERROR } from "../../constants/alert";
+import { NOTIFICATION, CHECK_ATTEND_SUCESSFUL,  ERR_SERVER_ERROR, CHECK_IN_SUCCESS } from "../../constants/alert";
 
 import autobind from "class-autobind";
 import { 
@@ -42,13 +44,15 @@ import axios from "axios";
 import BackgroundTimer from "react-native-background-timer";
 import TaskTodayView from "./taskToday";
 import TaskUpcomingView from "./taskUpcoming";
-import firebase from "../../../firebase";
+import firebase from "react-native-firebase";
+
+import { Navigation } from "react-native-navigation";
 
 const YELLOW_ORANGE = "#ffa500"
       
 
 class TaskEmployee extends Component {
-
+ 
   //contructors
   constructor(props) {
     super(props)
@@ -84,9 +88,13 @@ class TaskEmployee extends Component {
           break
       }
     }
+    // const localNoti = new firebase.notifications.Navigation()
+    // .setTitle("abc")
+    // .setBod
   }
 
   async componentDidMount() {
+    this.navigationEventListener = Navigation.events().bindComponent(this);
     const token = await AsyncStorage.getItem(TOKEN) 
     this.setState({userToken: token})
     this._getTodayTask()
@@ -106,7 +114,7 @@ class TaskEmployee extends Component {
     BackgroundTimer.runBackgroundTimer(() => { 
       console.log('list task not start: ', this.state.listTaskNotStart)
       if(typeof(this.state.listTaskNotStart !== undefined) &&
-         this.state.listTaskNotStart.length !==   0) {
+        this.state.listTaskNotStart.length !== 0) {
         this.state.listTaskNotStart.forEach((task) => {
           if (this._checkConditionForCheckAttendance(task)
               && !this.state.listWaitCheckAttendance.includes(task)){
@@ -209,7 +217,8 @@ class TaskEmployee extends Component {
         switch(err.response.status) {
           case 500: 
           case 502: 
-           ToastAndroid.showWithGravity(ERR_SERVER_ERROR,ToastAndroid.SHORT,ToastAndroid.BOTTOM)
+           ToastAndroid.showWithGravity(
+             ERR_SERVER_ERROR,ToastAndroid.SHORT,ToastAndroid.BOTTOM)
            break;
         }
      })
@@ -265,8 +274,8 @@ class TaskEmployee extends Component {
         this._getTodayTask()
         break;
       case 1:
-        this._setUpcomingTaskDateView()
         this._getUpcomingTask()
+        this._setUpcomingTaskDateView()
         break;
     }
     this.setState({
@@ -278,9 +287,9 @@ class TaskEmployee extends Component {
     var current = moment(new Date()),
         timeM = moment(time),
         differenceInMs = timeM.diff(current ,"minutes")
-        console.log('current time: ', current.toString())
-        console.log('moment time: ', timeM.toString())
-        console.log('different in ms: ', differenceInMs)
+        //console.log('current time: ', current.toString())
+        //console.log('moment time: ', timeM.toString())
+        //console.log('different in ms: ', differenceInMs)
     return differenceInMs
   }
 
@@ -295,37 +304,49 @@ class TaskEmployee extends Component {
      this.state.listCheckedAttendance = []
 
      if(this.state.listTaskNotStart.length === 0){
-      await Beacons.stopRangingBeaconsInRegion("iBeacons") 
-      console.log('da dong gate do list not start empty')
+      await Beacons.stopRangingBeaconsInRegion(IBEACONS) 
+      //console.log('da dong gate do list not start empty')
     }
-    console.log('remove : list not start after removed',this.state.listTaskNotStart)
+    //console.log('remove : list not start after removed',this.state.listTaskNotStart)
   }
 
   _checkGateStatus = async (listWaitCheckAttendance) => {
   if(listWaitCheckAttendance.length > 0) {
     Beacons.detectIBeacons()
     try {
-      console.log('Enter beacon check !')
-      await Beacons.startRangingBeaconsInRegion('iBeacons')
+      //console.log('Enter beacon check !')
+      await Beacons.startRangingBeaconsInRegion(IBEACONS)
       //console.log(`Beacons ranging started succesfully!`)
-      DeviceEventEmitter.addListener('beaconsDidRange', data => {
+      DeviceEventEmitter.addListener(BEACON_DID_RANGE, data => {
         //console.log('beacon found: ', data)
         // list
         const beaconLists = data.beacons
-        console.log("Beacon list: ", beaconLists)
+        //console.log("Beacon list: ", beaconLists)
         beaconLists.forEach(beacon => {
-          this.state.listWaitCheckAttendance.forEach((task,index,arrayWait)=>{
-            console.log('beacon_found :' , beacon.uuid + ' beacon_task',task.beaconModel)
+          this.state.listWaitCheckAttendance.forEach((task,index,arrayWait) => {
+            //console.log('beacon_found :' , beacon.uuid + ' beacon_task',task.beaconModel)
             if (beacon.uuid === task.beaconModel.uuid &&
                 beacon.major === task.beaconModel.major &&
                 beacon.minor === task.beaconModel.minor){
-                  console.log('tim thay beacon trung')
+                  //console.log('tim thay beacon trung')
               axios.put(requestCheckAttendanceForTask(task.id), {},{
-                
               }).then(t => {
+                let localNoti = new firebase.notifications.Notification()
+                      .setNotificationId('CheckInBeaconId')
+                      .setTitle(CHECK_IN_SUCCESS)
+                      .setBody(CHECK_ATTEND_SUCESSFUL)
+                      .android.setChannelId("channelOEM")
+                      .android.setSmallIcon("ic_launcher")
+                    let date = new Date();
+                    date.setSeconds(date.getSeconds() + 2);
+                    //console.log('date after set mins : ', date)
+                    //console.log('local noti: ', localNoti)
+                    firebase.notifications().scheduleNotification(localNoti, {
+                      fireDate: date.getTime(),
+                    })
                   this._getTodayTask()
                   Vibration.vibrate(700)
-                  Alert.alert(NOTIFICATION, CHECK_ATTEND_SUCESSFUL)
+                  //Alert.alert(NOTIFICATION, CHECK_ATTEND_SUCESSFUL)
               })
               this.state.listCheckedAttendance.push(task)
               arrayWait.splice(index,1)
@@ -342,12 +363,11 @@ class TaskEmployee extends Component {
       console.log(`Beacons ranging not started, error: ${error}`)
       console.log('da dong gate list wait empty')
     }
-     
   } else { 
     //await DeviceEventEmitter.emit('beaconsDidRange')
     //DeviceEventEmitter.removeListener('beaconsDidRange')
     console.log('gate closed')
-    await Beacons.stopRangingBeaconsInRegion("iBeacons")
+    await Beacons.stopRangingBeaconsInRegion(IBEACONS)
   }}
 
   _renderTodayTask() {

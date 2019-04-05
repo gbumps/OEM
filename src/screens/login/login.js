@@ -15,9 +15,16 @@ import {
 } from 'react-native';
 import LinearGradient from "react-native-linear-gradient";
 import DeviceInfo from "react-native-device-info";
-import BackgroundTimer from "react-native-background-timer";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { CONTENT_TYPE, USER, TOKEN, PHONENUMBER, IOS, SESSION_EXPIRE_TIME } from "../../constants/common";
+import { 
+  CONTENT_TYPE, 
+  USER, TOKEN, 
+  PHONENUMBER, IOS, 
+  SESSION_EXPIRE_TIME, 
+  HELLO_HAVE_A_NICE_DAY,
+  HELLO_INPUT_PASSWORD_TO_CONTINUE,
+  HELLO_WELCOME_TO_OEM
+} from "../../constants/common";
 import { 
   NOTIFICATION, 
   ERR_PHONE_NUMBER_NOT_FOUND, 
@@ -29,12 +36,14 @@ import {
 import axios from "axios";
 import { requestPhoneNumber, requestLoginURL } from "../../apis/loginAPI";
 import autobind from "class-autobind";
-import { baseColor } from "../../constants/mainSetting";
+import { baseColor, DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/mainSetting";
 import { requestAccountByPhoneNumber, requestUpdateUserInfo } from "../../apis/userAPI";
 import renderBottomTab from "../../elements/bottomTab";
 import { Navigation } from "react-native-navigation";
-import firebase from "../../../firebase";
+import firebase from "react-native-firebase";
 import moment from "moment";
+import RNExitApp from "react-native-exit-app";
+
 
 class Login extends Component {
   //options for navigation
@@ -52,20 +61,24 @@ class Login extends Component {
     this.state = {
       isLoggedIn: false,
       phoneNumber: "",
-      password: ""
+      password: "",
+      welcomeText: ""
     }
    autobind(this)
   }
   
   async componentWillMount() {
     axios.defaults.headers.common[CONTENT_TYPE] = "application/json"
-    BackgroundTimer.stopBackgroundTimer()
   }
 
   //called after view is rendered
   async componentDidMount() {
     //console.log("minutes: ", )
     //console.log("date + time expired: ", 
+    let arr = [HELLO_HAVE_A_NICE_DAY, HELLO_INPUT_PASSWORD_TO_CONTINUE,HELLO_WELCOME_TO_OEM]
+    this.setState({
+      welcomeText: arr[Math.floor(Math.random() * arr.length) + 0]
+    })
     let macAddress = ""
     if (Platform.OS === IOS) {
       macAddress = await DeviceInfo.getUniqueID()
@@ -74,7 +87,11 @@ class Login extends Component {
     }
     axios.get(requestPhoneNumber(macAddress)).then(phoneNumber => {
       if (phoneNumber.data === "") {
-        Alert.alert(NOTIFICATION, ERR_PHONE_NUMBER_NOT_FOUND)
+        Alert.alert(NOTIFICATION, ERR_PHONE_NUMBER_NOT_FOUND,[], {
+          onDismiss: async () => {
+            RNExitApp.exitApp()
+          }
+        })
         return;
       } else {
         this.setState({
@@ -82,6 +99,7 @@ class Login extends Component {
         })
       }
     }).catch(err => {
+      console.log("err: ", err)
       ToastAndroid.showWithGravity(
         ERR_SERVER_ERROR,
         ToastAndroid.SHORT,
@@ -119,7 +137,7 @@ class Login extends Component {
       await AsyncStorage.setItem(SESSION_EXPIRE_TIME, 
         today.add(duration, "minutes").toString())
       const tokenFirebase = await firebase.messaging().getToken()
-      //console.log("token firebase: ", tokenFirebase)
+      console.log("token firebase at login page: ", tokenFirebase)
       const link = requestUpdateUserInfo(userData.id)
       await axios({
         url: link,
@@ -201,7 +219,9 @@ class Login extends Component {
         colors={["#7474BF", "#348AC7"]} 
         style={styles.container}>
           <Image source={require('../../assets/icon/welcomeLogo.png')} />
-          <Text style={styles.phoneNumber}>{this.state.phoneNumber}</Text>
+            <Text style={styles.phoneNumberText}>
+              {this.state.welcomeText}
+            </Text>
           <TextInput 
             placeholderTextColor={"#ccc"}
             secureTextEntry={true} 
@@ -229,12 +249,15 @@ class Login extends Component {
 }
 
 const styles = StyleSheet.create({
-  phoneNumber: {
-    alignSelf: "center",
-    justifyContent: "center",
-    alignItems: "center", 
-    fontSize: 35,
+  // phoneNumberView: {
+  //   width: DEVICE_WIDTH,
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
+  phoneNumberText: {
+    fontSize: 22,
     color: "white",
+    textAlign: "center",
     fontFamily: "Roboto-Black"
   },
   textInputStyle: {

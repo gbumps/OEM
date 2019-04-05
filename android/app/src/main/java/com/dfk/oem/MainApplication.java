@@ -3,6 +3,7 @@ package com.dfk.oem;
 import android.app.Application;
 
 
+import com.github.wumke.RNExitApp.RNExitAppPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -50,7 +51,7 @@ public class MainApplication extends NavigationApplication {
 
         return Arrays.<ReactPackage>asList(
             // eg. new VectorIconsPackage()
-
+            new RNExitAppPackage(),
                 new RNDeviceInfo(),
             new BackgroundTimerPackage(),
             new BeaconsAndroidPackage(),

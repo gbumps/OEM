@@ -13,6 +13,7 @@ export const ERR_RETYPE_PASS_DONT_MATCH = "Mật khẩu mới và mật khẩu g
 export const ERR_SERVER_ERROR = "Lỗi kết nối đến máy chủ, vui lòng thử lại sau ít phút"
 
 export const NOTIFICATION = "Thông Báo"
+export const NOTIFICATION_TURNED_OFF = "Vị trí đang tắt"
 export const MIN_FILE_LIMIT = "Bạn phải chụp ít nhất một hình"
 export const MAX_FILE_LIMIT = "Bạn chỉ được chụp tối đa 6 hình !" 
 export const UPDATE_TASK_SUCCESS = "Công việc đã được cập nhật thành công!"
@@ -20,6 +21,8 @@ export const UPDATE_TASK_FAILED = "Công việc chưa thể cập nhật, vui l�
 export const CHECK_ATTEND_SUCESSFUL = "Điểm danh công việc thành công !"
 export const REQUIRE_FIELD_VALIDATOR = "Yêu cầu nhập đầy đủ thông tin !"
 export const REQUIRE_RELOGIN = "Đổi mật khẩu thành công, yêu cầu đăng nhập lại !"
+export const REQUEST_LOCATION_TURN_ON = "Bật vị trí để cải thiện định vị trên bản đồ và điểm danh"
+export const CHECK_IN_SUCCESS = "Điểm danh thành công !"
 
 export const SESSION_EXPIRED = "Phiên đã hết hạn, vui lòng đăng nhập lại !"
 export const CONFIRM = "Xác nhận"

@@ -3,7 +3,8 @@ import {
   View, 
   StyleSheet,
   Text,
-  AsyncStorage, 
+  AsyncStorage,
+  Alert 
  } from "react-native";
 import MapView, {PROVIDER_GOOGLE, Marker, Callout} from "react-native-maps";
 import { DEVICE_HEIGHT, DEVICE_WIDTH, baseColor } from "../../constants/mainSetting";
@@ -17,6 +18,7 @@ import axios from "axios";
 import { Navigation } from "react-native-navigation";
 
 import mapStyle from "./mapStyle";
+import { NOTIFICATION, NOTIFICATION_TURNED_OFF, REQUEST_LOCATION_TURN_ON } from "../../constants/alert";
 
 export default class Maps extends Component {
   
@@ -53,12 +55,14 @@ export default class Maps extends Component {
            })
       },
       err => {
-        console.log('err map: ', err);
+        console.log('err code: ', err.code)
+        Alert.alert(NOTIFICATION_TURNED_OFF, REQUEST_LOCATION_TURN_ON)
       },
   )
 }
 
   async componentDidMount() {
+    this.navigationEventListener = Navigation.events().bindComponent(this);
     this._getCompanyInfo()
     Navigation.events().registerBottomTabSelectedListener(({ selectedTabIndex }) => {
       if (selectedTabIndex === 1) {
@@ -73,6 +77,7 @@ export default class Maps extends Component {
       let lats = [], lons = []
         if(res.data.length === 0) {
           this._setUserLocation()
+          return;
         }
         else {
           res.data.forEach(companyData => {
@@ -100,13 +105,16 @@ export default class Maps extends Component {
           })
         }
     }).catch(err => { 
-      this._setUserLocation()
+      //if (err.code == 2) {
+      //  Alert.alert(NOTIFICATION_TURNED_OFF, REQUEST_LOCATION_TURN_ON)
+      //}
+      //this._setUserLocation()
     })
   }
   
   _compareTimeToCurrent(time) { 
     var current = moment(new Date()),
-        timeM = moment(new Date(time.replace(ZONE_TIME,"Z"))),
+        timeM = moment(time),
         differenceInMs = timeM.diff(current ,"minutes")
         // console.log('time pass: ', time)
         // console.log('current time: ', current)
@@ -139,7 +147,7 @@ export default class Maps extends Component {
           timeDiffFromStartTime = this._compareTimeToCurrent(startTimeAtCompany),
           timeDiffFromEndTime = this._compareTimeToCurrent(endTimeAtCompany),
           timeDiffFromPreEndtime = (endTimePrevious !== 0) ? this._compareTimeToCurrent(endTimePrevious) : 0
-      console.log('time diff of com ' + index, timeDiffFromStartTime, timeDiffFromEndTime )
+      //console.log('time diff of com ' + index, timeDiffFromStartTime, timeDiffFromEndTime )
       if (
           (timeDiffFromStartTime < 0 && timeDiffFromEndTime > 0) ||  // start < current < end
           (timeDiffFromStartTime > 0 && timeDiffFromPreEndtime <= 0) // 0 <= current < start or preEnd < current < start
@@ -206,7 +214,7 @@ export default class Maps extends Component {
           customMapStyle={mapStyle}
           initialCamera={this.state.camera}
           moveOnMarkerPress={true}
-          followsUserLocation={true} >
+          followsUserLocation={true}>
            {this._renderMarker(this.state.companyList)}
         </MapView>
       </View>  

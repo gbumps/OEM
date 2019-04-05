@@ -20,11 +20,70 @@ import {
   SEE_TASK,
   DISMISS
 } from "./src/constants/common";
-import firebase from "./firebase";
-import { checkSession  } from "./src/functions/functions";
-//put screen into stack
+//import firebase from "./firebase";
+import firebase from "react-native-firebase";
+import { checkSession } from "./src/functions/functions";
 registerScreen();
 
+Navigation.setDefaultOptions({
+  bottomTabs: {
+    titleDisplayMode: "alwaysHide", // for android
+    animate: false
+  },
+  bottomTab: {
+    iconInsets: { top: 0, left: 0, bottom: 0, right: 0 },
+    iconColor: "gray",
+    selectedIconColor: baseColor,
+  },
+  layout: {
+    backgroundColor: 'white',
+    orientation: "portrait"
+  },
+  animations: {
+    setRoot: {
+      enabled: "true", // Optional, used to enable/disable the animation
+      alpha: {
+        from: 0,
+        to: 1,
+        duration: 400,
+        startDelay: 100,
+        interpolation: "accelerate"
+      }
+    },
+    push: {
+      content: {
+        x: {
+          from: DEVICE_WIDTH,
+          to: 0,
+          duration: 200,
+          interpolation: 'accelerate',
+        }
+      }
+    },
+    pop: {
+      content: {
+        x: {
+          from: 0,
+          to: DEVICE_WIDTH,
+          duration: 200,
+          interpolation: 'accelerate',
+        }
+      }
+    },
+    showModal:{
+      alpha: {
+        from: 0,
+        to: 1
+      }
+    },
+    dismissModal: {
+      alpha: {
+        from: 1,
+        to: 0
+      }
+    }
+  }
+});
 //when app start, set root screens
 Navigation.events().registerAppLaunchedListener(async() => {
   //await AsyncStorage.setItem(USER.ID, "2")
@@ -32,8 +91,10 @@ Navigation.events().registerAppLaunchedListener(async() => {
   //await AsyncStorage.setItem("SESSION_EXPIRE_TIME", 
   //         moment(new Date()).add(moment.duration(120000).asMinutes(), "minutes").toString())
   checkSession()
+  
   const userId = await AsyncStorage.getItem(USER.ID),
         token  = await AsyncStorage.getItem(TOKEN) 
+  console.log('token: ', token)
   await AsyncStorage.multiRemove([
     TASK_REPORT_PROBLEM_TEMP, 
     TASK_IN_PROGRESS_TEMP_ID, 
@@ -49,7 +110,6 @@ Navigation.events().registerAppLaunchedListener(async() => {
     }) 
   } 
   else {
-
     Navigation.setRoot({ 
       root: {
         component: {
@@ -59,9 +119,16 @@ Navigation.events().registerAppLaunchedListener(async() => {
     })
   }
 
+//   let channel = new firebase.notifications.Android.Channel('channelOEM', 'Test Channel', firebase.notifications.Android.Importance.Max)
+//   .setDescription('My apps test channel');
+
+// // Create the channel
+//   await firebase.notifications().android.createChannel(channel);
+
   firebase.messaging().getToken().then(token => {
-    
+    //console.log('token firebase: ', token)    
   })
+
   firebase.notifications().getInitialNotification().then(notificationOpen => {
     //trigger when app opened by tapping on notification
     //if app opened as usual way will received undefined
@@ -77,10 +144,14 @@ Navigation.events().registerAppLaunchedListener(async() => {
       }
     })
   }) 
+
+  
+
   firebase.notifications().onNotification((notification) => {
     //trigger notification received when in-app 
     notification.android.setChannelId("channelOEM")
-    firebase.notifications().displayNotification(notification)
+    notification.android.setSmallIcon('ic_launcher');
+    firebase.notifications().displayNotification(notification);
     //phone vibrate 700 ms
     Vibration.vibrate(700)
     const { title, body } = notification;
@@ -118,56 +189,4 @@ Navigation.events().registerAppLaunchedListener(async() => {
   // }catch(err) {
   //   console.log('err: ', err)
   // }
-
-
-
-//set default view option through the whole app
-Navigation.setDefaultOptions({
-  bottomTabs: {
-    titleDisplayMode: "alwaysHide", // for android
-    animate: false,
-  },
-  bottomTab: {
-    iconInsets: { top: 0, left: 0, bottom: 0, right: 0 },
-    disableIconTint: true,
-    selectedIconColor: baseColor
-  },
-  layout: {
-    backgroundColor: 'white',
-    orientation: "portrait"
-  },
-  animations: {
-    push: {
-      content: {
-        x: {
-          from: DEVICE_WIDTH,
-          to: 0,
-          duration: 200,
-          interpolation: 'accelerate',
-        }
-      }
-    },
-    pop: {
-      content: {
-        x: {
-          from: 0,
-          to: DEVICE_WIDTH,
-          duration: 200,
-          interpolation: 'accelerate',
-        }
-      }
-    },
-    showModal:{
-      alpha: {
-        from: 0,
-        to: 1
-      }
-    },
-    dismissModal: {
-      alpha: {
-        from: 1,
-        to: 0
-      }
-    }}
-  });
-})
+ })

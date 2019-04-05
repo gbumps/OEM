@@ -324,8 +324,7 @@ class TaskSubmitReport extends Component {
                   }}/>
                 )) }
           </ScrollView>
-          <View style={[{ display: this.state.reportFunctionsView
-            }, styles.reportFunctionView]}> 
+          <View style={[{ display: this.state.reportFunctionsView }, styles.reportFunctionView]}> 
             <View style={styles.cameraBtnComponent}>
             <TouchableOpacity onPress={ this._handlePressCamera }>
               <Icon name="camera" size={30} color="white" />

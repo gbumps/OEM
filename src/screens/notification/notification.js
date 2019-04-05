@@ -27,23 +27,10 @@ import {
 } from "../../constants/common";
 import { DEVICE_HEIGHT, baseColor } from "../../constants/mainSetting";
 import { ERR_INTERNET_CONNECTION, ERR_SERVER_ERROR } from "../../constants/alert";
-import firebase from "../../../firebase";
+import firebase from "react-native-firebase";
 
 class Notification extends Component {
  
-  static get options() {
-    return {
-      topBar: {
-        title: {
-          text: NOTIFICATION_SCREEN.vnName
-        }
-      }, 
-      bottomTab: {
-
-      }
-    }
-  }
-
   componentDidUpdate(prevStates) {
     if (this.state.unseenCount !== prevStates.unseenCount) {
       this._mergeOptionNavigation()
@@ -59,7 +46,6 @@ class Notification extends Component {
       refreshing: false 
     }
     autobind(this)
-    this.navigationEventListener = Navigation.events().bindComponent(this);
   }
   //functions
 
@@ -69,12 +55,13 @@ class Notification extends Component {
   }
 
   async componentDidMount() {
+    this.navigationEventListener = Navigation.events().bindComponent(this);
     this._getNotiHistory()
     this._mergeOptionNavigation()
     this._loadUnseenCountNotification()
     const userId = await AsyncStorage.getItem(USER.ID)
     Navigation.events().registerBottomTabSelectedListener(({ selectedTabIndex }) => {
-      if (selectedTabIndex === 2) {
+      if (selectedTabIndex === 2 && this.state.notiHistory.length !== 0) {
          this._getNotificationFromServer(
            userId, 
            DEFAULT_PAGE_NOTIFICATION, 
@@ -156,11 +143,15 @@ class Notification extends Component {
   
   _getTimeReceivedNotification(today, dateReceived) {
     let time = today.diff(moment(dateReceived), "days")
-    if (time === 0) {
+    if (time == 0) {
       time = today.diff(moment(dateReceived), "hours") 
       if (time > 0) return time + " h"
-      else return today.diff(moment(dateReceived), "minutes") + " phút"
+      else {
+        time = today.diff(moment(dateReceived), "minutes")
+        if (time > 0) return time + " phút"
+        else return "vài giây"
     } 
+   }
     return time + " ngày"
   }
 

@@ -22,7 +22,7 @@ import axios from "axios";
 import { requestUserInfoURL } from "../../apis/userAPI";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-
+import BackgroundTimer  from "react-native-background-timer";
 
 
 const Touchable = (props) => (
@@ -50,16 +50,6 @@ const Touchable = (props) => (
 )
 
 class Option extends Component {
-
-  static get options() {
-    return {
-      topBar: {
-        title: {
-          text: OPTION_SCREEN.vnName
-        }
-      }
-    }
-  }  //contructors
 
   constructor(props) {
     super(props)
@@ -103,6 +93,7 @@ class Option extends Component {
 
   async componentDidMount() {
     this._loadUserInfo()
+    this.navigationEventListener = Navigation.events().bindComponent(this);
   }
 
   //render view
@@ -164,6 +155,7 @@ class Option extends Component {
             Alert.alert('Đăng xuất', 'Bạn có muốn đăng xuất ?',[{
                 text: YES, 
                 onPress: async () => {
+                  BackgroundTimer.stopBackgroundTimer()
                   await AsyncStorage.multiRemove([USER.ID, TOKEN,PHONENUMBER, SESSION_EXPIRE_TIME])
                   await Navigation.setRoot({
                      root: {
