@@ -37,10 +37,8 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>Bắt buộc truy nhập vào camera để sử dụng được tính năng này</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Bắt buộc truy nhập vị trí cho điểm danh và bản đồ</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Bắt buộc truy nhập vị trí cho điểm danh và chỉ đường trên bản đồ</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Lato-Black.ttf</string>
@@ -71,11 +69,11 @@
 		<string>Octicons.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
+		<string>Roboto_medium.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
-		<string>fetch</string>
 		<string>location</string>
 		<string>remote-notification</string>
 	</array>
