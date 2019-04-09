@@ -24,28 +24,11 @@ import {
   LOADING_SCREEN,
 } from "../../constants/screen";
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/mainSetting";
-import { 
-  TOKEN, 
-  USER, YES, NO, AUTHORIZATION, PLACEHOLDER_DESCRIPTION, TASK_IN_PROGRESS_TEMP_ID, TASK_REPORT_PROBLEM_TEMP, TASK_REPORT_WORK_TEMP, TASK_REPORT_WORK_DESCRIPTION_TEMP, TASK_REPORT_PROBLEM_DESCRIPTION_TEMP, REPORT_PROBLEM, REPORT_TASK, END_TASK, REPORT_PROBLEM_NAME } from "../../constants/common";
-import { 
-  NOTIFICATION, 
-  MAX_FILE_LIMIT, 
-  MIN_FILE_LIMIT, 
-  UPDATE_TASK_SUCCESS, 
-  UPDATE_TASK_FAILED, 
-  CONFIRM,
-  CONFIRM_SUBMIT_MESSAGE,
-  CONFIRM_SUBMIT_REPORT,
-  CONFIRM_SUBMIT_PROBLEM
-} from "../../constants/alert";
+import * as commons from "../../constants/common"; 
+import * as alerts from "../../constants/alert";
 
 const GREEN = "#00a86a"
 
-const listSuggestDescriptions = [
-  "Tôi đã hoàn thành công việc",
-  "Tôi có vấn đề này",
-  "Khác"
-]
 
 class TaskSubmitReport extends Component {
  
@@ -58,7 +41,8 @@ class TaskSubmitReport extends Component {
      reportType: "",
      taskCheckList: [],
      editable: false,
-     reportFunctionsView: "flex"
+     reportFunctionsView: "flex",
+     listSuggestDescriptionCheck: []
    }
   //  this._submitReport = this._submitReport.bind(this)
   //  this._handleSubmitReport = this._handleSubmitReport.bind(this)
@@ -77,34 +61,34 @@ class TaskSubmitReport extends Component {
   async componentWillUnmount() {
     if(this.state.imgUris.length !== 0 && 
        this.state.description.length !== 0)
-    await AsyncStorage.setItem(TASK_IN_PROGRESS_TEMP_ID, this.state.taskId.toString())
+    await AsyncStorage.setItem(commons.TASK_IN_PROGRESS_TEMP_ID, this.state.taskId.toString())
     switch(this.state.reportType) {
-      case REPORT_TASK:
-        await AsyncStorage.setItem(TASK_REPORT_WORK_TEMP, this.state.imgUris.toString())
-        await AsyncStorage.setItem(TASK_REPORT_WORK_DESCRIPTION_TEMP, this.state.description.toString())
+      case commons.REPORT_TASK:
+        await AsyncStorage.setItem(commons.TASK_REPORT_WORK_TEMP, this.state.imgUris.toString())
+        await AsyncStorage.setItem(commons.TASK_REPORT_WORK_DESCRIPTION_TEMP, this.state.description.toString())
         break 
-      case REPORT_PROBLEM:
-        await AsyncStorage.setItem(TASK_REPORT_PROBLEM_TEMP, this.state.imgUris.toString())
-        await AsyncStorage.setItem(TASK_REPORT_PROBLEM_DESCRIPTION_TEMP, this.state.description.toString())
+      case commons.REPORT_PROBLEM:
+        await AsyncStorage.setItem(commons.TASK_REPORT_PROBLEM_TEMP, this.state.imgUris.toString())
+        await AsyncStorage.setItem(commons.TASK_REPORT_PROBLEM_DESCRIPTION_TEMP, this.state.description.toString())
         break
     }
   }
 
   async componentWillMount() {
-    axios.defaults.headers.common[AUTHORIZATION] =await AsyncStorage.getItem(TOKEN)
+    axios.defaults.headers.common[commons.AUTHORIZATION] =await AsyncStorage.getItem(commons.TOKEN)
     const {reportType, taskId, taskStatus, taskCheckList} = this.props
     const tempWorkReport = await Promise.all([
-      AsyncStorage.getItem(TASK_IN_PROGRESS_TEMP_ID),
-      AsyncStorage.getItem(TASK_REPORT_WORK_TEMP),
-      AsyncStorage.getItem(TASK_REPORT_WORK_DESCRIPTION_TEMP)
+      AsyncStorage.getItem(commons.TASK_IN_PROGRESS_TEMP_ID),
+      AsyncStorage.getItem(commons.TASK_REPORT_WORK_TEMP),
+      AsyncStorage.getItem(commons.TASK_REPORT_WORK_DESCRIPTION_TEMP)
     ])
     const tempProblemReport = await Promise.all([
-      AsyncStorage.getItem(TASK_IN_PROGRESS_TEMP_ID),
-      AsyncStorage.getItem(TASK_REPORT_PROBLEM_TEMP),
-      AsyncStorage.getItem(TASK_REPORT_PROBLEM_DESCRIPTION_TEMP)
+      AsyncStorage.getItem(commons.TASK_IN_PROGRESS_TEMP_ID),
+      AsyncStorage.getItem(commons.TASK_REPORT_PROBLEM_TEMP),
+      AsyncStorage.getItem(commons.TASK_REPORT_PROBLEM_DESCRIPTION_TEMP)
     ])
     switch (reportType) {
-      case REPORT_TASK: 
+      case commons.REPORT_TASK: 
         if (tempWorkReport[0] == this.props.taskId) {
           this.setState({
             imgUris: tempWorkReport[1].split(","),
@@ -112,7 +96,7 @@ class TaskSubmitReport extends Component {
           })
         }
         break
-      case REPORT_PROBLEM:
+      case commons.REPORT_PROBLEM:
         if (tempProblemReport[0] == this.props.taskId) {
           this.setState({
             imgUris: tempProblemReport[1].split(","),
@@ -150,7 +134,7 @@ class TaskSubmitReport extends Component {
       }, 
     })
     
-    const userId = await AsyncStorage.getItem(USER.ID)
+    const userId = await AsyncStorage.getItem(commons.USER.ID)
     const imageUrls = await Promise.all(
       this.state.imgUris.map(async (uri) => {
       const link = uploadImageAPI(), 
@@ -189,31 +173,31 @@ class TaskSubmitReport extends Component {
     }).then(async (res) => {
         Navigation.dismissAllModals()
         switch(this.state.reportType) {
-          case REPORT_TASK: 
+          case commons.REPORT_TASK: 
             await AsyncStorage.multiRemove([
-              TASK_REPORT_WORK_DESCRIPTION_TEMP,
-              TASK_REPORT_WORK_TEMP
+              commons.TASK_REPORT_WORK_DESCRIPTION_TEMP,
+              commons.TASK_REPORT_WORK_TEMP
             ])
             break;
-          case REPORT_PROBLEM: 
+          case commons.REPORT_PROBLEM: 
             await AsyncStorage.multiRemove([
-              TASK_REPORT_PROBLEM_DESCRIPTION_TEMP,
-              TASK_REPORT_PROBLEM_TEMP
+              commons.TASK_REPORT_PROBLEM_DESCRIPTION_TEMP,
+              commons.TASK_REPORT_PROBLEM_TEMP
             ])
             break;
         }
-        Alert.alert(NOTIFICATION, UPDATE_TASK_SUCCESS,[],{
+        Alert.alert(alerts.NOTIFICATION, alerts.UPDATE_TASK_SUCCESS,[],{
           onDismiss: () => Navigation.popToRoot(TASK_SCREEN.id)
         })
     }).catch(err => {
         Navigation.dismissAllModals()
-        Alert.alert(NOTIFICATION, UPDATE_TASK_FAILED)
+        Alert.alert(alerts.NOTIFICATION, alerts.UPDATE_TASK_FAILED)
     })
    }
 
    _handlePressCamera() { 
       if (this.state.imgUris.length === 6) {
-        Alert.alert(NOTIFICATION, MAX_FILE_LIMIT)
+        Alert.alert(alerts.NOTIFICATION, alerts.MAX_FILE_LIMIT)
         return;
       }
       Navigation.showModal({
@@ -227,31 +211,31 @@ class TaskSubmitReport extends Component {
 
    _handleSubmitReport() {
     if (this.state.imgUris.length === 0) {
-      Alert.alert(NOTIFICATION, MIN_FILE_LIMIT)
+      Alert.alert(alerts.NOTIFICATION, alerts.MIN_FILE_LIMIT)
       return;
     }
     else {
       switch (this.state.reportType) {
         case 1: 
-        Alert.alert(CONFIRM_SUBMIT_MESSAGE, CONFIRM_SUBMIT_REPORT, [
+        Alert.alert(alerts.CONFIRM_SUBMIT_MESSAGE, alerts.CONFIRM_SUBMIT_REPORT, [
           {
-            text: YES,
+            text: commons.YES,
             onPress: this._submitReport
           }, 
           {
-            text: NO,
+            text: commons.NO,
             onPress: () => console.log('User Denied')
           }
         ])
         break
         case 2:
-        Alert.alert(CONFIRM, CONFIRM_SUBMIT_PROBLEM, [
+        Alert.alert(alerts.CONFIRM, alerts.CONFIRM_SUBMIT_PROBLEM, [
           {
-            text: YES,
+            text: commons.YES,
             onPress: this._submitReport
           }, 
           {
-            text: NO,
+            text: commons.NO,
             onPress: () => console.log('User Denied')
           }
         ])
@@ -265,6 +249,9 @@ class TaskSubmitReport extends Component {
   
 
   render() {
+    this.setState({
+      listSuggestDescriptionCheck: [true, false, false]
+    })
     return( 
       <View style={styles.container}>
         <TextInput style={styles.textDescription}
@@ -275,28 +262,33 @@ class TaskSubmitReport extends Component {
             })
           }}
           value={this.state.description}
-          placeholder={PLACEHOLDER_DESCRIPTION}
+          placeholder={commons.PLACEHOLDER_DESCRIPTION}
         />
         <View> 
           {
-            listSuggestDescriptions.map((t,i) => {
+            commons.listSuggestDescriptions.map((t,i) => {
               return (
                 <CheckBox containerStyle={styles.checkBoxContainer} 
                   title={t}
                   onPress={() => {
-                    if (t == listSuggestDescriptions[2]) {
+                    this.state.listSuggestDescriptionCheck.fill(false)
+                    this.state.listSuggestDescriptionCheck[i] = true
+                    if (t == commons.listSuggestDescriptions[2]) {
                       this.setState({
                         editable: true,
-                        description: "" 
+                        description: "",
+                        listSuggestDescriptionCheck: this.state.listSuggestDescriptionCheck
                       })
                     }
                     else {
                       this.setState({
                         editable: false,
-                        description: t
+                        description: t,
+                        listSuggestDescriptionCheck: this.state.listSuggestDescriptionCheck
                       })
                     }
                   }} 
+                  checked={this.state.listSuggestDescriptionCheck[i]}
                   checkedIcon="dot-circle-o"
                   uncheckedIcon="circle-o">
                   <Text>{t}</Text>
@@ -333,7 +325,7 @@ class TaskSubmitReport extends Component {
             <View style={styles.endButton}>
               <TouchableOpacity onPress={this._handleSubmitReport}> 
                 <Text style={{color: "white", fontSize: 20}}>
-                  {this.state.reportType === 1 ? END_TASK : REPORT_PROBLEM_NAME} 
+                  {this.state.reportType === 1 ? commons.END_TASK : commons.REPORT_PROBLEM_NAME} 
                 </Text>
               </TouchableOpacity> 
               </View>

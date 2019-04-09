@@ -23,7 +23,8 @@ import {
   TOKEN, USER, 
   GREY, YELLOW_ORANGE, 
   MINUTES_DAY, DEFAULT_PAGE_NOTIFICATION, 
-  MAXIMUM_NOTIFICATION_UPDATE, 
+  MAXIMUM_NOTIFICATION_UPDATE,
+  RED, 
 } from "../../constants/common";
 import { DEVICE_HEIGHT, baseColor } from "../../constants/mainSetting";
 import { ERR_INTERNET_CONNECTION, ERR_SERVER_ERROR } from "../../constants/alert";
@@ -220,8 +221,8 @@ class Notification extends Component {
     else { 
       Navigation.mergeOptions(NOTIFICATION_SCREEN.id, {
         bottomTab: {
-          badge: this.state.unseenCount,
-          badgeColor: baseColor,
+          badge: String(this.state.unseenCount),
+          badgeColor: RED,
         }
       })
     }

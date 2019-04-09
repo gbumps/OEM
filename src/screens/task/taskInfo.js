@@ -17,7 +17,6 @@ import {
   TASK_REPORT_PROBLEM_SCREEN,
   TASK_SCREEN,
   COMPANY_INFO_SCREEN,
-  MAP_SCREEN,
   NOTIFICATION_SCREEN,
 } from "../../constants/screen";
 import renderStatusBar from "../../elements/statusBar";
@@ -33,30 +32,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import getDirections from 'react-native-google-maps-directions'
 import { fetchBaseColor } from "../../functions/functions";
 import moment from "moment";
-import { 
-  SUNDAY, 
-  MONDAY, 
-  TUESDAY, 
-  WEDNESDAY, 
-  THURSDAY, 
-  FRIDAY, 
-  SATURDAY, 
-  TASK_NOT_START,
-  TOKEN,
-  TASK_IN_PROGRESS,
-  ABSENT,
-  TASK_COMPLETED,
-  AUTHORIZATION,
-  CONTENT_TYPE,
-  NO_IMAGE,
-  TASK_WAITING_FOR_APPROVE,
-  HOUR_FORMAT,
-  RED,
-  REPORT_TASK,
-  REPORT_PROBLEM,
-  YELLOW_ORANGE,
-  NO_DETAIL
-} from "../../constants/common";
+import * as commons from "../../constants/common";
 import axios from "axios";
 import { requestTaskDetailURL } from "../../apis/taskAPI";
 import { 
@@ -124,8 +100,8 @@ class TaskInfo extends Component {
   }
   //functions
   async componentWillMount() {
-    axios.defaults.headers.common[CONTENT_TYPE] = "application/json"
-    axios.defaults.headers.common[AUTHORIZATION] =await AsyncStorage.getItem(TOKEN)
+    axios.defaults.headers.common[commons.CONTENT_TYPE] = "application/json"
+    axios.defaults.headers.common[commons.AUTHORIZATION] =await AsyncStorage.getItem(commons.TOKEN)
     navigator.geolocation.getCurrentPosition(
       pos => {
         let lat = parseFloat(pos.coords.latitude),
@@ -157,14 +133,14 @@ class TaskInfo extends Component {
     axios.get(link, { }).then(res => {
       res.data.checkList.map(t => this.state.checkList.push(t.status === 0 ? false: true))
       switch(res.data.status) {
-        case TASK_COMPLETED:
-        case TASK_NOT_START:
-        case TASK_WAITING_FOR_APPROVE: 
+        case commons.TASK_COMPLETED:
+        case commons.TASK_NOT_START:
+        case commons.TASK_WAITING_FOR_APPROVE: 
           this.setState({
             submitCompleteBtn: "none"
           })
           break;
-        case TASK_IN_PROGRESS:
+        case commons.TASK_IN_PROGRESS:
           this.setState({ 
             submitCompleteBtn: "flex"
           })
@@ -213,8 +189,8 @@ class TaskInfo extends Component {
 
   //calculate from date to date
   _calculateWorkTime(fromDate, toDate) {
-    let startTime = moment(fromDate).format(HOUR_FORMAT).toString(),
-        endTime = moment(toDate).format(HOUR_FORMAT).toString()
+    let startTime = moment(fromDate).format(commons.HOUR_FORMAT).toString(),
+        endTime = moment(toDate).format(commons.HOUR_FORMAT).toString()
     return "Từ " +  startTime + " đến " + endTime
   }
   
@@ -228,12 +204,12 @@ class TaskInfo extends Component {
           checkState={this.state.checkList[index]} 
           onPress={() => { 
             switch(this.state.task.status) {
-              case TASK_COMPLETED:
-              case TASK_NOT_START:
-              case TASK_WAITING_FOR_APPROVE: 
+              case commons.TASK_COMPLETED:
+              case commons.TASK_NOT_START:
+              case commons.TASK_WAITING_FOR_APPROVE: 
                 return;
             } 
-            if (this.state.task.attendanceStatus === ABSENT) {
+            if (this.state.task.attendanceStatus === commons.ABSENT) {
               return;
             }
             this.state.checkList[index] = !this.state.checkList[index]
@@ -254,7 +230,7 @@ class TaskInfo extends Component {
 
   _handleLoadImage(list) {
     if (list.length == 0) {
-      return (<Text style={{color: RED, ...styles.title}}>Không có hình ảnh</Text>) 
+      return (<Text style={{color: commons.RED, ...styles.title}}>Không có hình ảnh</Text>) 
     }
     return (
     <ScrollView
@@ -319,13 +295,13 @@ class TaskInfo extends Component {
     }
     else {
       var weekday = new Array(7);
-          weekday[0] =  SUNDAY;
-          weekday[1] = MONDAY;
-          weekday[2] = TUESDAY;
-          weekday[3] = WEDNESDAY;
-          weekday[4] = THURSDAY;
-          weekday[5] = FRIDAY;
-          weekday[6] = SATURDAY;
+          weekday[0] = commons.SUNDAY;
+          weekday[1] = commons.MONDAY;
+          weekday[2] = commons.TUESDAY;
+          weekday[3] = commons.WEDNESDAY;
+          weekday[4] = commons.THURSDAY;
+          weekday[5] = commons.FRIDAY;
+          weekday[6] = commons.SATURDAY;
 
       const workTime = this._calculateWorkTime(taskDetail.startTime,taskDetail.endTime),
             workDate = new Date(taskDetail.startTime.replace("+0000", "Z"))
@@ -333,7 +309,7 @@ class TaskInfo extends Component {
       return (
       <View style={{flex: 1}}>
         <Text style={[styles.taskName, {
-          color:  (taskDetail.attendanceStatus === ABSENT) ? 
+          color:  (taskDetail.attendanceStatus === commons.ABSENT) ? 
           "#f43030" : fetchBaseColor(this.state.task.status)}]}>
           {taskDetail.title}
         </Text>
@@ -348,7 +324,7 @@ class TaskInfo extends Component {
         </View>
         <TouchableOpacity onPress={ this.handleGetDirections }>
         <View style={styles.titleContainer}>
-          <FontAwesome5 name="location-arrow" size={25} color="#dc3545" />
+          {/* <FontAwesome5 name="location-arrow" size={25} color="#dc3545" /> */}
           <Text style={styles.title}> Chỉ đường tới công ty </Text>
         </View>
         </TouchableOpacity>
@@ -373,7 +349,7 @@ class TaskInfo extends Component {
             padding: 25,
             fontSize: 18,
             fontFamily: "Roboto-Regular"
-          }}>{(taskDetail.description.length === 0) ? NO_DETAIL : taskDetail.description }</Text>
+          }}>{(taskDetail.description.length === 0) ? commons.NO_DETAIL : taskDetail.description }</Text>
         </View>
         <TouchableOpacity onPress={() => this.setState({
           showImageWorkplace: this.state.showImageWorkplace === 'none' ? 'flex' : 'none'
@@ -389,12 +365,12 @@ class TaskInfo extends Component {
           <Image 
             source={{
                uri: (taskDetail.workplace.picture === "") ? 
-               NO_IMAGE:
+               commons.NO_IMAGE:
                taskDetail.workplace.picture }}
             style={{width: DEVICE_WIDTH, height: 200}}/>
         </View>
         <View style={[styles.titleContainer]}>
-          <Icon name="list-ol" size={25} color={YELLOW_ORANGE} />
+          <Icon name="list-ol" size={25} color={commons.YELLOW_ORANGE} />
           <Text style={styles.title}> Danh sách công việc </Text>
         </View>
         <View style={{ marginLeft: 15 }}>
@@ -402,7 +378,7 @@ class TaskInfo extends Component {
         </View>
         <View style={{display: this._loadReports()}}>
           <View style={[styles.titleContainer]}>
-            <Icon name="list-ol" size={25} color={YELLOW_ORANGE} />
+            <Icon name="list-ol" size={25} color={commons.YELLOW_ORANGE} />
             <Text style={styles.title}> Báo cáo công việc </Text>
           </View>
           <View> 
@@ -423,7 +399,7 @@ class TaskInfo extends Component {
         </View>
         <View style={{display: this._loadProblem()}}>
           <View style={[styles.titleContainer]}>
-            <MaterialIcons name="report-problem" size={25} color={YELLOW_ORANGE} />
+            <MaterialIcons name="report-problem" size={25} color={commons.YELLOW_ORANGE} />
             <Text style={styles.title}> Báo cáo vấn đề </Text> 
           </View>
           <View>
@@ -453,19 +429,19 @@ class TaskInfo extends Component {
           taskCheckList = this.state.task.checkList,
           taskAttendance = this.state.task.attendanceStatus
           
-    if(taskStatus === TASK_NOT_START && taskAttendance !== ABSENT) {
+    if(taskStatus === commons.TASK_NOT_START && taskAttendance !== commons.ABSENT) {
       Alert.alert(NOTIFICATION, ERR_TASK_NOT_START)
       return;
-    } else if (taskAttendance === ABSENT) {
+    } else if (taskAttendance === commons.ABSENT) {
      Alert.alert(NOTIFICATION, ERR_TASK_OVERDUE)
      return;
-    } else if (taskStatus === TASK_COMPLETED || this.state.imageReports.length !== 0) {
+    } else if (taskStatus === commons.TASK_COMPLETED || this.state.imageReports.length !== 0) {
       Alert.alert(NOTIFICATION, ERR_TASK_COMPLETED) 
       return;
     } else if (type === 2 && this.state.imageProblem.length !== 0) {
       Alert.alert(NOTIFICATION, ERR_REPORT_PROBLEM_ALREADY_SUBMITTED )
       return;
-    } else if (type === 2 && taskStatus === TASK_WAITING_FOR_APPROVE) {
+    } else if (type === 2 && taskStatus === commons.TASK_WAITING_FOR_APPROVE) {
       Alert.alert(NOTIFICATION, ERR_TASK_COMPLETED) 
       return;
     }
@@ -514,12 +490,12 @@ class TaskInfo extends Component {
           leftItemPress={() => {
             this._handlePop()
           }}
-          rightItem={<Icon name="warning" size={25} color={RED} />}   
-          rightItemPress={() => this._handleNavigation(REPORT_PROBLEM)}
+          rightItem={<Icon name="warning" size={25} color={commons.RED} />}   
+          rightItemPress={() => this._handleNavigation(commons.REPORT_PROBLEM)}
           toolbarColor='#fff'  
           src={{
             uri: (this.state.task.zonePicture === "") ? 
-            NO_IMAGE :
+            commons.NO_IMAGE :
             this.state.task.zonePicture }}>
             {this._renderTaskDetailView(this.state.task)}
         </CollapsingToolbar>
@@ -530,7 +506,7 @@ class TaskInfo extends Component {
             styles.buttonComplete, 
             {display: this.state.submitCompleteBtn}
           ]}
-          onPress={() => this._handleNavigation(REPORT_TASK)}> 
+          onPress={() => this._handleNavigation(commons.REPORT_TASK)}> 
           <Text style={{color: "white", fontSize: 20}}>HOÀN THÀNH</Text>
         </TouchableOpacity> 
       </View>

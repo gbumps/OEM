@@ -89,6 +89,7 @@ class TaskTodayView extends Component {
               </View>
               <View>
                <Badge status="primary" value={this.props.listTaskInProgress.length} 
+                    textStyle={{color: "white"}}
                      badgeStyle={this._returnBadgeStyle(YELLOW_ORANGE)} />
               </View>
             </View>
@@ -106,6 +107,7 @@ class TaskTodayView extends Component {
               </View>
               <View> 
                <Badge status="primary" value={this.props.listTaskPendingApproval.length} 
+                      textStyle={{color: "white"}}
                       badgeStyle={this._returnBadgeStyle(baseColor)}
                />
               </View>
@@ -124,6 +126,7 @@ class TaskTodayView extends Component {
               </View>
               <View>
                <Badge status="primary" value={this.props.listTaskNotStart.length} 
+                      textStyle={{color: "white"}}
                       badgeStyle={this._returnBadgeStyle("#aaaaaa")} />
               </View>
             </View>
@@ -141,6 +144,7 @@ class TaskTodayView extends Component {
               </View>
               <View> 
                 <Badge status="primary" value={this.props.listTaskCompleted.length} 
+                       textStyle={{color: "white"}}
                        badgeStyle={this._returnBadgeStyle(GREEN)}
                 />
               </View>
@@ -159,6 +163,7 @@ class TaskTodayView extends Component {
               </View>
               <View> 
                 <Badge status="primary" value={this.props.listTaskAbsent.length} 
+                       textStyle={{color: "white"}}
                        badgeStyle={this._returnBadgeStyle(RED)}
                 />
               </View>

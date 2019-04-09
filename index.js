@@ -1,6 +1,6 @@
 import { Navigation } from "react-native-navigation";
 import { registerScreen } from "./screens";
-import { AsyncStorage, Alert, Vibration } from "react-native";
+import { AsyncStorage, Alert, Vibration, Platform } from "react-native";
 import { 
   LOGIN_SCREEN, TASK_INFO_SCREEN,
 } from "./src/constants/screen";
@@ -18,72 +18,76 @@ import {
   TASK_REPORT_PROBLEM_DESCRIPTION_TEMP,
   TASK_REPORT_WORK_TEMP,
   SEE_TASK,
-  DISMISS
+  DISMISS,
+  IOS,
+  ANDROID
 } from "./src/constants/common";
 //import firebase from "./firebase";
 import firebase from "react-native-firebase";
 import { checkSession } from "./src/functions/functions";
 registerScreen();
 
-Navigation.setDefaultOptions({
-  bottomTabs: {
-    titleDisplayMode: "alwaysHide", // for android
-    animate: false
-  },
-  bottomTab: {
-    iconInsets: { top: 0, left: 0, bottom: 0, right: 0 },
-    iconColor: "gray",
-    selectedIconColor: baseColor,
-  },
-  layout: {
-    backgroundColor: 'white',
-    orientation: "portrait"
-  },
-  animations: {
-    setRoot: {
-      enabled: "true", // Optional, used to enable/disable the animation
-      alpha: {
-        from: 0,
-        to: 1,
-        duration: 400,
-        startDelay: 100,
-        interpolation: "accelerate"
-      }
+if (Platform.OS === ANDROID) {
+  Navigation.setDefaultOptions({
+    bottomTabs: {
+      titleDisplayMode: "alwaysHide", // for android
+      animate: false
     },
-    push: {
-      content: {
-        x: {
-          from: DEVICE_WIDTH,
-          to: 0,
-          duration: 200,
-          interpolation: 'accelerate',
-        }
-      }
+    bottomTab: {
+      iconInsets: { top: 0, left: 0, bottom: 0, right: 0 },
+      iconColor: "gray",
+      selectedIconColor: baseColor,
     },
-    pop: {
-      content: {
-        x: {
+    layout: {
+      backgroundColor: 'white',
+      orientation: "portrait"
+    },
+    animations: {
+      setRoot: {
+        enabled: "true", // Optional, used to enable/disable the animation
+        alpha: {
           from: 0,
-          to: DEVICE_WIDTH,
-          duration: 200,
-          interpolation: 'accelerate',
+          to: 1,
+          duration: 400,
+          startDelay: 100,
+          interpolation: "accelerate"
         }
-      }
-    },
-    showModal:{
-      alpha: {
-        from: 0,
-        to: 1
-      }
-    },
-    dismissModal: {
-      alpha: {
-        from: 1,
-        to: 0
+      },
+      push: {
+        content: {
+          x: {
+            from: DEVICE_WIDTH,
+            to: 0,
+            duration: 200,
+            interpolation: 'accelerate',
+          }
+        }
+      },
+      pop: {
+        content: {
+          x: {
+            from: 0,
+            to: DEVICE_WIDTH,
+            duration: 200,
+            interpolation: 'accelerate',
+          }
+        }
+      },
+      showModal:{
+        alpha: {
+          from: 0,
+          to: 1
+        }
+      },
+      dismissModal: {
+        alpha: {
+          from: 1,
+          to: 0
+        }
       }
     }
-  }
-});
+  });
+}
 //when app start, set root screens
 Navigation.events().registerAppLaunchedListener(async() => {
   //await AsyncStorage.setItem(USER.ID, "2")
@@ -126,7 +130,7 @@ Navigation.events().registerAppLaunchedListener(async() => {
 //   await firebase.notifications().android.createChannel(channel);
 
   firebase.messaging().getToken().then(token => {
-    //console.log('token firebase: ', token)    
+    console.log('token firebase: ', token)    
   })
 
   firebase.notifications().getInitialNotification().then(notificationOpen => {
@@ -179,7 +183,67 @@ Navigation.events().registerAppLaunchedListener(async() => {
   })
 //   firebase.notifications().onNotificationOpened((notificationOpen) => {
 //     // Get the action triggered by the notification being opened
-    
+   if (Platform.OS === IOS) {
+    Navigation.setDefaultOptions({
+      bottomTabs: {
+        titleDisplayMode: "alwaysHide", // for android
+        animate: false
+      },
+      bottomTab: {
+        iconInsets: { top: 0, left: 0, bottom: 0, right: 0 },
+        iconColor: "gray",
+        selectedIconColor: baseColor,
+      },
+      layout: {
+        backgroundColor: 'white',
+        orientation: "portrait"
+      },
+      animations: {
+        setRoot: {
+          enabled: "true", // Optional, used to enable/disable the animation
+          alpha: {
+            from: 0,
+            to: 1,
+            duration: 400,
+            startDelay: 100,
+            interpolation: "accelerate"
+          }
+        },
+        push: {
+          content: {
+            x: {
+              from: DEVICE_WIDTH,
+              to: 0,
+              duration: 200,
+              interpolation: 'accelerate',
+            }
+          }
+        },
+        pop: {
+          content: {
+            x: {
+              from: 0,
+              to: DEVICE_WIDTH,
+              duration: 200,
+              interpolation: 'accelerate',
+            }
+          }
+        },
+        showModal:{
+          alpha: {
+            from: 0,
+            to: 1
+          }
+        },
+        dismissModal: {
+          alpha: {
+            from: 1,
+            to: 0
+          }
+        }
+      }
+    });
+  } 
 // }); 
   // try {
   //   firebase.messaging().onMessage((message) => {
@@ -189,4 +253,4 @@ Navigation.events().registerAppLaunchedListener(async() => {
   // }catch(err) {
   //   console.log('err: ', err)
   // }
- })
+})

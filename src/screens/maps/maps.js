@@ -18,7 +18,7 @@ import axios from "axios";
 import { Navigation } from "react-native-navigation";
 
 import mapStyle from "./mapStyle";
-import { NOTIFICATION, NOTIFICATION_TURNED_OFF, REQUEST_LOCATION_TURN_ON } from "../../constants/alert";
+import { NOTIFICATION_TURNED_OFF, REQUEST_LOCATION_TURN_ON } from "../../constants/alert";
 
 export default class Maps extends Component {
   
@@ -81,28 +81,35 @@ export default class Maps extends Component {
         }
         else {
           res.data.forEach(companyData => {
-            lats.push(companyData.latitude)
-            lons.push(companyData.longitude)
-          })
-          const maxLat = Math.max(...lats), 
-              maxLon = Math.max(...lons),
-              minLat = Math.min(...lats),
-              minLon = Math.min(...lons),  
-              mLat = (maxLat + minLat) / 2,
-              mLon = (maxLon + minLon) / 2
-          this.setState({
-            companyList: res.data,
-            camera: {
-              center: {
-                latitude: mLat,
-                longitude: mLon
-              },
-              pitch: 16,
-              heading: 16,
-              zoom: 12,
-              altitude: 20
+            if (companyData.latitude !== null && companyData.longitude !== null) {
+              lats.push(companyData.latitude)
+              lons.push(companyData.longitude)
             }
           })
+          if (lats.length !== 0 && lons.length !== 0) {
+            const maxLat = Math.max(...lats), 
+                maxLon = Math.max(...lons),
+                minLat = Math.min(...lats),
+                minLon = Math.min(...lons),  
+                mLat = (maxLat + minLat) / 2,
+                mLon = (maxLon + minLon) / 2
+            this.setState({
+              companyList: res.data,
+              camera: {
+                center: {
+                  latitude: mLat,
+                  longitude: mLon
+                },
+                pitch: 16,
+                heading: 16,
+                zoom: 12,
+                altitude: 20
+              }
+            })
+          } else {
+            this._setUserLocation()
+            return; 
+          }
         }
     }).catch(err => { 
       //if (err.code == 2) {

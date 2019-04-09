@@ -63,6 +63,12 @@ export const HELLO_WELCOME_TO_OEM = "Chào mừng đến với OEM"
 export const HELLO_INPUT_PASSWORD_TO_CONTINUE = "Đăng nhập để bắt đầu làm việc"
 export const HELLO_HAVE_A_NICE_DAY = "Chúc bạn có một ngày làm việc vui vẻ !"
 
+export const listSuggestDescriptions = [
+  "Tôi đã hoàn thành công việc",
+  "Tôi có vấn đề này",
+  "Khác"
+]
+
 export const YELLOW_ORANGE = "#ffa500"
 export const GREY = "#afafaf"
 export const GREEN = "#06a86a"

@@ -5,7 +5,6 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  Alert,
   AsyncStorage,
   DeviceEventEmitter,
   Platform,
@@ -22,17 +21,18 @@ import {
   UPCOMING, 
   TASK_NOT_START, 
   TASK_IN_PROGRESS, 
-  TOKEN, ZONE_TIME, 
+  TOKEN, 
   TIME_ATTENDANCE_AVAILABLE, 
   IOS, TASK_COMPLETED, 
   ABSENT, AUTHORIZATION, 
   CONTENT_TYPE, TASK_WAITING_FOR_APPROVE, 
   HOUR_FORMAT,
   BEACON_DID_RANGE,
-  IBEACONS, 
+  IBEACONS,
+  ANDROID, 
 } from "../../constants/common";
 import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSetting";
-import { NOTIFICATION, CHECK_ATTEND_SUCESSFUL,  ERR_SERVER_ERROR, CHECK_IN_SUCCESS } from "../../constants/alert";
+import { CHECK_ATTEND_SUCESSFUL,  ERR_SERVER_ERROR, CHECK_IN_SUCCESS } from "../../constants/alert";
 
 import autobind from "class-autobind";
 import { 
@@ -102,15 +102,29 @@ class TaskEmployee extends Component {
     if(Platform.OS === IOS)  {
       BackgroundTimer.start()
     }
-    // Beacons.detectIBeacons() 
-    // await Beacons.startRangingBeaconsInRegion('iBeacons')
-    //   console.log(`Beacons ranging started succesfully!`)
+    // if(Platform.OS === ANDROID) {
+    //   Beacons.detectIBeacons() 
+    // }
+    //Beacons.requestWhenInUseAuthorization();
+    //await Beacons.startMonitoringForRegion();
+    // Beacons.startRangingBeaconsInRegion({identifier: 'iBeacons',
+    // uuid: 'fda50693-a4e2-4fb1-afcf-c6eb07647825'})
+    
+    // //   console.log(`Beacons ranging started succesfully!`)
+    // Beacons.startRangingBeaconsInRegion({identifier: IBEACONS, 
+    //   uuid: 'fda50693-a4e2-4fb1-afcf-c6eb07647825'})
     //   DeviceEventEmitter.addListener('beaconsDidRange', data => {
     //     // list
     //     const beaconLists = data.beacons
     //     console.log("Beacon list: ", beaconLists)
     //   })
-    
+    //   setTimeout(async() => {
+    //     await Beacons.stopRangingBeaconsInRegion({identifier: IBEACONS}) 
+    //   }, 5000)
+    // if (Platform.OS === IOS) {
+    //   Beacons.startUpdatingLocation();
+    // }
+    //await Beacons.stopRangingBeaconsInRegion({identifier: IBEACONS})
     BackgroundTimer.runBackgroundTimer(() => { 
       console.log('list task not start: ', this.state.listTaskNotStart)
       if(typeof(this.state.listTaskNotStart !== undefined) &&
@@ -122,7 +136,7 @@ class TaskEmployee extends Component {
           }
         }) 
          console.log('list wait',this.state.listWaitCheckAttendance)
-          this._checkGateStatus(this.state.listWaitCheckAttendance)
+          this._checkGateStatus()
         }
     }, 
       10000
@@ -131,23 +145,6 @@ class TaskEmployee extends Component {
     firebase.notifications().onNotification((notification) => {
        this._getTodayTask()
     })
-    // const localTime = moment(new Date())
-    // const timeExpired = moment(await AsyncStorage.getItem(SESSION_EXPIRE_TIME))
-    // if (timeExpired.diff(localTime) < 0) {
-    //   Alert.alert(NOTIFICATION,SESSION_EXPIRED,[],{
-    //     onDismiss: async () => {
-    //       await AsyncStorage.multiRemove([USER.ID, TOKEN, PHONENUMBER])
-    //       await Navigation.setRoot({
-    //          root: {
-    //            component: {
-    //              name: LOGIN_SCREEN.settingName
-    //            }
-    //          }
-    //       })
-    //     }
-    //   })      
-    // }
-    //checkSession()
   } 
 
   async componentWillMount() {
@@ -304,18 +301,22 @@ class TaskEmployee extends Component {
      this.state.listCheckedAttendance = []
 
      if(this.state.listTaskNotStart.length === 0){
-      await Beacons.stopRangingBeaconsInRegion(IBEACONS) 
+      await Beacons.stopRangingBeaconsInRegion({identifier: IBEACONS}) 
       //console.log('da dong gate do list not start empty')
     }
     //console.log('remove : list not start after removed',this.state.listTaskNotStart)
   }
 
-  _checkGateStatus = async (listWaitCheckAttendance) => {
-  if(listWaitCheckAttendance.length > 0) {
+  _checkGateStatus = async () => {
+  if(this.state.listWaitCheckAttendance.length > 0) {
     Beacons.detectIBeacons()
     try {
       //console.log('Enter beacon check !')
-      await Beacons.startRangingBeaconsInRegion(IBEACONS)
+      const initialRegion = {
+        identifier: IBEACONS,
+        uuid: this.state.listWaitCheckAttendance[0].beaconModel.uuid
+      }
+      await Beacons.startRangingBeaconsInRegion(initialRegion)//IBEACONS)
       //console.log(`Beacons ranging started succesfully!`)
       DeviceEventEmitter.addListener(BEACON_DID_RANGE, data => {
         //console.log('beacon found: ', data)
@@ -346,7 +347,7 @@ class TaskEmployee extends Component {
                     })
                   this._getTodayTask()
                   Vibration.vibrate(700)
-                  //Alert.alert(NOTIFICATION, CHECK_ATTEND_SUCESSFUL)
+                  Alert.alert(NOTIFICATION, CHECK_ATTEND_SUCESSFUL)
               })
               this.state.listCheckedAttendance.push(task)
               arrayWait.splice(index,1)
@@ -367,7 +368,7 @@ class TaskEmployee extends Component {
     //await DeviceEventEmitter.emit('beaconsDidRange')
     //DeviceEventEmitter.removeListener('beaconsDidRange')
     console.log('gate closed')
-    await Beacons.stopRangingBeaconsInRegion(IBEACONS)
+    await Beacons.stopRangingBeaconsInRegion({identifier: IBEACONS})
   }}
 
   _renderTodayTask() {
