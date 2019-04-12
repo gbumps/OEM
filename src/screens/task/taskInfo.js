@@ -324,7 +324,7 @@ class TaskInfo extends Component {
         </View>
         <TouchableOpacity onPress={ this.handleGetDirections }>
         <View style={styles.titleContainer}>
-          {/* <FontAwesome5 name="location-arrow" size={25} color="#dc3545" /> */}
+          <FontAwesome5 name="location-arrow" size={25} color="#dc3545" />
           <Text style={styles.title}> Chỉ đường tới công ty </Text>
         </View>
         </TouchableOpacity>
@@ -445,14 +445,15 @@ class TaskInfo extends Component {
       Alert.alert(NOTIFICATION, ERR_TASK_COMPLETED) 
       return;
     }
-    Navigation.push(TASK_INFO_SCREEN.id, { 
+    Navigation.push(TASK_INFO_SCREEN.id,{ 
       component: {
         name: TASK_REPORT_SCREEN.settingName,
         passProps: {
           reportType: type,
           taskId: taskId,
           taskStatus: taskStatus,
-          taskCheckList: (type === 1) ? taskCheckList : []
+          taskCheckList: (type === 1) ? taskCheckList : [],
+          navigateFrom: this.props.navigateFrom
         },
         options: {
           topBar: renderTopTab((type === 1) ? TASK_REPORT_SCREEN : TASK_REPORT_PROBLEM_SCREEN), 
@@ -474,7 +475,7 @@ class TaskInfo extends Component {
       case NOTIFICATION_SCREEN.id: 
         Navigation.popTo(NOTIFICATION_SCREEN.id)
         break
-      case "taskNotification": 
+      case commons.TASK_NOTIFICATION: 
         Navigation.dismissAllModals()
         break
      }
@@ -573,7 +574,7 @@ buttonCompleteComponent: {
   checkBox: {
     borderWidth: 0,
     backgroundColor: "transparent",
-    width: 300
+    width: DEVICE_WIDTH - 100
   }
 })
 

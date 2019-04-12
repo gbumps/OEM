@@ -130,6 +130,7 @@ export default class CompanyInfo extends Component {
         onPress={() => {
           Navigation.push(MAP_SCREEN.id, {
             component: {
+              id: TASK_INFO_SCREEN.id,
               name: TASK_INFO_SCREEN.settingName, 
               passProps: {
                 taskId: task.id,

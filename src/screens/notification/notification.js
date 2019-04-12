@@ -61,6 +61,16 @@ class Notification extends Component {
     this._mergeOptionNavigation()
     this._loadUnseenCountNotification()
     const userId = await AsyncStorage.getItem(USER.ID)
+    Navigation.events().registerCommandListener((name, params) => {
+      //console.log("params: ", name, params)
+      if (name === "popTo" && params.componentId === NOTIFICATION_SCREEN.id) {
+        this._getNotificationFromServer(
+          userId, 
+          DEFAULT_PAGE_NOTIFICATION, 
+          this.state.notiHistory.length
+        )
+      }
+    });
     Navigation.events().registerBottomTabSelectedListener(({ selectedTabIndex }) => {
       if (selectedTabIndex === 2 && this.state.notiHistory.length !== 0) {
          this._getNotificationFromServer(

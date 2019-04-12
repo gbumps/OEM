@@ -115,7 +115,7 @@ export default class Maps extends Component {
       //if (err.code == 2) {
       //  Alert.alert(NOTIFICATION_TURNED_OFF, REQUEST_LOCATION_TURN_ON)
       //}
-      //this._setUserLocation()
+      this._setUserLocation()
     })
   }
   

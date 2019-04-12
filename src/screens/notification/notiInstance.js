@@ -40,6 +40,7 @@ export default Noti = (props) => (
       () => { 
         Navigation.push(NOTIFICATION_SCREEN.id, {
           component: {
+            id: TASK_INFO_SCREEN.id,
             name: TASK_INFO_SCREEN.settingName,
             passProps: {
                taskId: props.taskId,

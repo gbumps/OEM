@@ -22,6 +22,9 @@ import {
   CAMERA_SCREEN, 
   TASK_SCREEN, 
   LOADING_SCREEN,
+  MAP_SCREEN,
+  NOTIFICATION_SCREEN,
+  COMPANY_INFO_SCREEN,
 } from "../../constants/screen";
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/mainSetting";
 import * as commons from "../../constants/common"; 
@@ -42,7 +45,7 @@ class TaskSubmitReport extends Component {
      taskCheckList: [],
      editable: false,
      reportFunctionsView: "flex",
-     listSuggestDescriptionCheck: []
+     listSuggestDescriptionCheck: [true, false, false]
    }
   //  this._submitReport = this._submitReport.bind(this)
   //  this._handleSubmitReport = this._handleSubmitReport.bind(this)
@@ -77,6 +80,7 @@ class TaskSubmitReport extends Component {
   async componentWillMount() {
     axios.defaults.headers.common[commons.AUTHORIZATION] =await AsyncStorage.getItem(commons.TOKEN)
     const {reportType, taskId, taskStatus, taskCheckList} = this.props
+    console.log("props: ", this.props)
     const tempWorkReport = await Promise.all([
       AsyncStorage.getItem(commons.TASK_IN_PROGRESS_TEMP_ID),
       AsyncStorage.getItem(commons.TASK_REPORT_WORK_TEMP),
@@ -187,7 +191,7 @@ class TaskSubmitReport extends Component {
             break;
         }
         Alert.alert(alerts.NOTIFICATION, alerts.UPDATE_TASK_SUCCESS,[],{
-          onDismiss: () => Navigation.popToRoot(TASK_SCREEN.id)
+          onDismiss: () => this._handlePop()
         })
     }).catch(err => {
         Navigation.dismissAllModals()
@@ -208,6 +212,23 @@ class TaskSubmitReport extends Component {
         }
       }
     })}
+
+    _handlePop() {
+     switch(this.props.navigateFrom) {
+      case TASK_SCREEN.id:
+        Navigation.popToRoot(TASK_SCREEN.id,{})
+        break;
+      case COMPANY_INFO_SCREEN.id:
+        Navigation.popToRoot(MAP_SCREEN.id,{})
+        break;
+      case NOTIFICATION_SCREEN.id: 
+        Navigation.popToRoot(NOTIFICATION_SCREEN.id,{})
+        break
+      //case commons.TASK_NOTIFICATION: 
+      //  Navigation.dismissAllModals()
+      //  break
+     }
+  }
 
    _handleSubmitReport() {
     if (this.state.imgUris.length === 0) {
@@ -249,9 +270,7 @@ class TaskSubmitReport extends Component {
   
 
   render() {
-    this.setState({
-      listSuggestDescriptionCheck: [true, false, false]
-    })
+    
     return( 
       <View style={styles.container}>
         <TextInput style={styles.textDescription}

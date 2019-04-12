@@ -16,11 +16,12 @@ import {
 import { OPTION_SCREEN, LOGIN_SCREEN, CHANGE_PASSWORD_SCREEN } from "../../constants/screen";
 import { Navigation } from "react-native-navigation";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { USER, ROLE, TOKEN, CONTENT_TYPE, AUTHORIZATION, YES, NO, YELLOW_ORANGE, GREY, PHONENUMBER, SESSION_EXPIRE_TIME } from "../../constants/common"
+import { USER, ROLE, TOKEN, CONTENT_TYPE, AUTHORIZATION, YES, NO, YELLOW_ORANGE, GREY, PHONENUMBER, SESSION_EXPIRE_TIME, BIRTHDAY, ADDRESS, MANAGER, PHONE_NUMBER_MANAGER } from "../../constants/common"
 import { DEVICE_WIDTH, baseColor } from "../../constants/mainSetting";
 import axios from "axios";
 import { requestUserInfoURL } from "../../apis/userAPI";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import moment from "moment";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import BackgroundTimer  from "react-native-background-timer";
 
@@ -116,22 +117,26 @@ class Option extends Component {
           </View>
           <Touchable 
             iconLeft={<FontAwesome name="birthday-cake" size={22} color={RED}/>}
-            field="Ngày sinh"
-            text={this.state.userInfo.birthDate}
+            field={BIRTHDAY}
+            text={moment(this.state.userInfo.birthDate).format("DD/MM/YYYY")}
           />
           <Touchable 
             iconLeft={<FontAwesome name="home" size={22} color={baseColor}/>}
-            field="Địa chỉ"
-            text={ this.state.userInfo.address }
+            field={ADDRESS}
+            text={ 
+              (this.state.userInfo.address !== undefined && this.state.userInfo.address.length >= 25) ? 
+              this.state.userInfo.address.substring(0,20) + "..." : 
+              this.state.userInfo.address
+            }
             />
           <Touchable 
             iconLeft={<FontAwesome name="vcard" size={22} color={VIOLET}/>}
-            field="Người Quản Lý"
+            field={MANAGER}
             text={(this.state.managerInfo.fullName === undefined) ? 
             "Không có thông tin" : this.state.managerInfo.fullName }/>
           <Touchable 
             iconLeft={<FontAwesome name="phone" size={22} color={GREEN}/>}
-            field="SĐT Quản Lý"
+            field={PHONE_NUMBER_MANAGER}
             text={(this.state.managerInfo.phoneNumber === undefined) ? 
             "Không có thông tin" : this.state.managerInfo.phoneNumber }
             onPress={ ()=>{Linking.openURL('tel:' + this.state.managerInfo.phoneNumber )} }
