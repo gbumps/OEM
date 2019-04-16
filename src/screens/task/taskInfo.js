@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Alert,
   AsyncStorage,
-  ScrollView
+  ScrollView,
+  ProgressBarAndroid
 } from 'react-native';
 import { CheckBox } from "react-native-elements";
 import { 
@@ -45,7 +46,7 @@ import {
 import autobind from "class-autobind";
 import ImageInstance from "../../elements/imageInstance";
 import { getReport } from "../../apis/reportAPI";
-
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const CheckBoxInstance = (props) => (
   <View style={styles.checkBoxContainerStyle}>
@@ -84,6 +85,7 @@ class TaskInfo extends Component {
     this.state = {
       task: {},
       checkList: [],
+      status: 0,
       showImageWorkplace: "none", 
       showDescription: "none", 
       descriptionReports: "",
@@ -93,7 +95,8 @@ class TaskInfo extends Component {
       imageProblem: [], 
       reportCompleteEvaluation: "",
       reportProblemEvaluation: "",
-      submitCompleteBtn: "none"
+      submitCompleteBtn: "none",
+      loading: true 
     }
     autobind(this)
     this.navigationEventListener = Navigation.events().bindComponent(this);
@@ -102,6 +105,9 @@ class TaskInfo extends Component {
   async componentWillMount() {
     axios.defaults.headers.common[commons.CONTENT_TYPE] = "application/json"
     axios.defaults.headers.common[commons.AUTHORIZATION] =await AsyncStorage.getItem(commons.TOKEN)
+    this.setState({
+      loading: true
+    })
     navigator.geolocation.getCurrentPosition(
       pos => {
         let lat = parseFloat(pos.coords.latitude),
@@ -147,11 +153,20 @@ class TaskInfo extends Component {
           break;
       }
       this.setState({
+        loading: false,
         task: res.data, 
         checkList: this.state.checkList
       })
     }).catch(err => {
-       console.log(err)
+       switch (err.response.status) {
+          case 500: 
+          case 502:
+            this.setState({
+              loading: false,
+              status: 500
+            })
+          break
+       }
     })
     const linkReport = getReport(this.props.taskId)
     let t = await axios.get(linkReport, {})
@@ -345,11 +360,9 @@ class TaskInfo extends Component {
         <View style={[ styles.descriptionContainer, 
            {display: this.state.showDescription }
          ]}> 
-          <Text style={{
-            padding: 25,
-            fontSize: 18,
-            fontFamily: "Roboto-Regular"
-          }}>{(taskDetail.description.length === 0) ? commons.NO_DETAIL : taskDetail.description }</Text>
+          <Text style={styles.taskDetailDescriptionStyle}>
+          {(taskDetail.description.length === 0) ? commons.NO_DETAIL : taskDetail.description }
+          </Text>
         </View>
         <TouchableOpacity onPress={() => this.setState({
           showImageWorkplace: this.state.showImageWorkplace === 'none' ? 'flex' : 'none'
@@ -418,7 +431,6 @@ class TaskInfo extends Component {
             </View>
           </View> 
         </View>
-        
       </View>
     )}
   }
@@ -484,33 +496,56 @@ class TaskInfo extends Component {
   //render view 
   render() {
     return (
+      this.state.loading === true ?
+    <View style={{
+        flex: 1,
+        backgroundColor: "transparent", 
+        justifyContent: "center", 
+        alignSelf: "center",
+        width:DEVICE_WIDTH,
+        height: DEVICE_HEIGHT
+    }}>
+      <ProgressBarAndroid animating={true} />
+    </View> : 
       <View style={{flex: 1}}>
-      <View style={{height: DEVICE_HEIGHT - 100}}>
-        <CollapsingToolbar 
-          leftItem={<Ionicons name="md-arrow-round-back" size={25} color={baseColor} />}
-          leftItemPress={() => {
-            this._handlePop()
-          }}
-          rightItem={<Icon name="warning" size={25} color={commons.RED} />}   
-          rightItemPress={() => this._handleNavigation(commons.REPORT_PROBLEM)}
-          toolbarColor='#fff'  
-          src={{
-            uri: (this.state.task.zonePicture === "") ? 
-            commons.NO_IMAGE :
-            this.state.task.zonePicture }}>
-            {this._renderTaskDetailView(this.state.task)}
-        </CollapsingToolbar>
-      </View>
-      <View style={styles.buttonCompleteComponent}>
-        <TouchableOpacity
-          style= {[
-            styles.buttonComplete, 
-            {display: this.state.submitCompleteBtn}
-          ]}
-          onPress={() => this._handleNavigation(commons.REPORT_TASK)}> 
-          <Text style={{color: "white", fontSize: 20}}>HOÀN THÀNH</Text>
-        </TouchableOpacity> 
-      </View>
+        {
+          (this.state.status === 500) ?
+           <View style={styles.errLoadInfoTask}>
+              <AntDesign name="questioncircle" size={60} color="#ccc"/>
+              <Text style={{ fontSize: 20 }}>
+                 Đã xảy ra lỗi
+              </Text>
+           </View>
+            : 
+           <View>
+            <View style={{height: DEVICE_HEIGHT - 100}}>
+              <CollapsingToolbar 
+                leftItem={<Ionicons name="md-arrow-round-back" size={25} color={baseColor} />}
+                leftItemPress={() => {
+                  this._handlePop()
+                }}
+                rightItem={<Icon name="warning" size={25} color={commons.RED} />}   
+                rightItemPress={() => this._handleNavigation(commons.REPORT_PROBLEM)}
+                toolbarColor='#fff'  
+                src={{
+                  uri: (this.state.task.zonePicture === "") ? 
+                  commons.NO_IMAGE :
+                  this.state.task.zonePicture }}>
+                  {this._renderTaskDetailView(this.state.task)}
+              </CollapsingToolbar>
+            </View>
+            <View style={styles.buttonCompleteComponent}>
+              <TouchableOpacity
+                style= {[
+                  styles.buttonComplete, 
+                  {display: this.state.submitCompleteBtn}
+                ]}
+                onPress={() => this._handleNavigation(commons.REPORT_TASK)}> 
+                <Text style={{color: "white", fontSize: 20}}>HOÀN THÀNH</Text>
+              </TouchableOpacity> 
+            </View>
+          </View>
+        }
     </View>
     )
   }
@@ -575,6 +610,18 @@ buttonCompleteComponent: {
     borderWidth: 0,
     backgroundColor: "transparent",
     width: DEVICE_WIDTH - 100
+  },
+  errLoadInfoTask: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    width: DEVICE_WIDTH,
+    height: DEVICE_HEIGHT 
+  },
+  taskDetailDescriptionStyle: {
+    padding: 25,
+    fontSize: 18,
+    fontFamily: "Roboto-Regular"
   }
 })
 

@@ -63,7 +63,9 @@ export const REPORT_PROBLEM_NAME = "BÁO CÁO VẤN ĐỀ"
 
 export const BEACON_DID_RANGE = "beaconsDidRange"
 export const IBEACONS = "iBeacons"
-
+export const CHECK_IN_BEACON_ID = "CheckInBeaconId"
+export const CHANNEL_NOTIFICATION_OEM = "channelOEM"
+export const IC_LAUNCHER = "ic_launcher"
 export const HELLO_WELCOME_TO_OEM = "Chào mừng đến với OEM"
 export const HELLO_INPUT_PASSWORD_TO_CONTINUE = "Đăng nhập để bắt đầu làm việc"
 export const HELLO_HAVE_A_NICE_DAY = "Chúc bạn có một ngày làm việc vui vẻ !"
@@ -78,4 +80,6 @@ export const YELLOW_ORANGE = "#ffa500"
 export const GREY = "#afafaf"
 export const GREEN = "#06a86a"
 export const RED = "#f43030"
-      
+
+export const GRADIENT_COLOR = ["#7474BF", "#348AC7"]
+export const PROMT_INPUT_PASSWORD = "Nhập mật khẩu"

@@ -7,7 +7,6 @@ import {
   StyleSheet,
   AsyncStorage,
   DeviceEventEmitter,
-  Platform,
   RefreshControl,
   NetInfo,
   Vibration,
@@ -29,7 +28,9 @@ import {
   HOUR_FORMAT,
   BEACON_DID_RANGE,
   IBEACONS,
-  ANDROID, 
+  CHANNEL_NOTIFICATION_OEM,
+  IC_LAUNCHER,
+  CHECK_IN_BEACON_ID, 
 } from "../../constants/common";
 import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSetting";
 import { CHECK_ATTEND_SUCESSFUL,  ERR_SERVER_ERROR, CHECK_IN_SUCCESS } from "../../constants/alert";
@@ -82,9 +83,6 @@ class TaskEmployee extends Component {
     this.setState({userToken: token})
     this._getTodayTask()
     this._getUpcomingTask()
-    if(Platform.OS === IOS)  {
-      BackgroundTimer.start()
-    }
     BackgroundTimer.runBackgroundTimer(() => { 
       console.log('list task not start: ', this.state.listTaskNotStart)
       if(typeof(this.state.listTaskNotStart !== undefined) &&
@@ -272,7 +270,7 @@ class TaskEmployee extends Component {
      this.state.listCheckedAttendance = []
 
      if(this.state.listTaskNotStart.length === 0){
-      await Beacons.stopRangingBeaconsInRegion({identifier: IBEACONS}) 
+      await Beacons.stopRangingBeaconsInRegion(IBEACONS) 
       //console.log('da dong gate do list not start empty')
     }
     //console.log('remove : list not start after removed',this.state.listTaskNotStart)
@@ -299,11 +297,11 @@ class TaskEmployee extends Component {
                axios.put(requestCheckAttendanceForTask(task.id), {},{
                }).then(t => {
                  let localNoti = new firebase.notifications.Notification()
-                       .setNotificationId('CheckInBeaconId')
+                       .setNotificationId(CHECK_IN_BEACON_ID)
                        .setTitle(CHECK_IN_SUCCESS)
                        .setBody(CHECK_ATTEND_SUCESSFUL)
-                       .android.setChannelId("channelOEM")
-                       .android.setSmallIcon("ic_launcher")
+                       .android.setChannelId(CHANNEL_NOTIFICATION_OEM)
+                       .android.setSmallIcon(IC_LAUNCHER)
                      let date = new Date();
                      date.setSeconds(date.getSeconds() + 2);
                      //console.log('date after set mins : ', date)
@@ -320,7 +318,7 @@ class TaskEmployee extends Component {
              }
            })
          })
-         if(this.state.listCheckedAttendance.length >0 ){
+         if(this.state.listCheckedAttendance.length > 0){
            this._removeTaskCheckedAttendance()
          }
        })
@@ -337,7 +335,7 @@ class TaskEmployee extends Component {
     //await DeviceEventEmitter.emit('beaconsDidRange')
     //DeviceEventEmitter.removeListener('beaconsDidRange')
     console.log('gate closed')
-    await Beacons.stopRangingBeaconsInRegion({identifier: IBEACONS})
+    await Beacons.stopRangingBeaconsInRegion(IBEACONS)
   }}
 
   _renderTodayTask() {

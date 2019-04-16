@@ -26,7 +26,9 @@ import {
   HELLO_HAVE_A_NICE_DAY,
   HELLO_INPUT_PASSWORD_TO_CONTINUE,
   HELLO_WELCOME_TO_OEM,
-  ANDROID
+  ANDROID,
+  GRADIENT_COLOR,
+  PROMT_INPUT_PASSWORD
 } from "../../constants/common";
 import { 
   NOTIFICATION, 
@@ -159,7 +161,7 @@ class Login extends Component {
       await AsyncStorage.setItem(SESSION_EXPIRE_TIME, 
         today.add(duration, "minutes").toString())
       const tokenFirebase = await firebase.messaging().getToken()
-      console.log("token firebase at login page: ", tokenFirebase)
+      //console.log("token firebase at login page: ", tokenFirebase)
       const link = requestUpdateUserInfo(userData.id)
       //console.log('link token firebase: ', link)
       axios({
@@ -254,7 +256,7 @@ class Login extends Component {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <LinearGradient 
           start={{x: 0, y: 1}} end={{x: 0, y: 0}} 
-          colors={["#7474BF", "#348AC7"]} 
+          colors={GRADIENT_COLOR} 
           style={styles.container}>
             <Image source={require('../../assets/icon/welcomeLogo.png')} />
               <Text style={styles.phoneNumberText}>
@@ -263,7 +265,7 @@ class Login extends Component {
             <TextInput 
               placeholderTextColor={"#ccc"}
               secureTextEntry={true} 
-              placeholder="Nhập mật khẩu"
+              placeholder={PROMT_INPUT_PASSWORD}
               keyboardType="numeric"
               style={styles.textInputStyle} 
                 value={this.state.password}
