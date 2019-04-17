@@ -1,5 +1,5 @@
 import React,{ Component } from "react";
-import { connect  } from "react-redux";
+import { connect } from "react-redux";
 import {
   View,
   Text,
@@ -10,43 +10,30 @@ import {
   RefreshControl,
   NetInfo,
   Vibration,
-  ToastAndroid
+  ToastAndroid, 
+  DatePickerAndroid
 } from 'react-native';
 import moment from "moment";
 import { ButtonGroup } from "react-native-elements";
 import Beacons from "react-native-beacons-manager";
-import { 
-  TODAY, 
-  UPCOMING, 
-  TASK_NOT_START, 
-  TASK_IN_PROGRESS, 
-  TOKEN, 
-  TIME_ATTENDANCE_AVAILABLE, 
-  IOS, TASK_COMPLETED, 
-  ABSENT, AUTHORIZATION, 
-  CONTENT_TYPE, TASK_WAITING_FOR_APPROVE, 
-  HOUR_FORMAT,
-  BEACON_DID_RANGE,
-  IBEACONS,
-  CHANNEL_NOTIFICATION_OEM,
-  IC_LAUNCHER,
-  CHECK_IN_BEACON_ID, 
-} from "../../constants/common";
+import * as commons from "../../constants/common";
 import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSetting";
-import { CHECK_ATTEND_SUCESSFUL,  ERR_SERVER_ERROR, CHECK_IN_SUCCESS } from "../../constants/alert";
-
+import { 
+  CHECK_ATTEND_SUCESSFUL,  
+  ERR_SERVER_ERROR, 
+  CHECK_IN_SUCCESS 
+} from "../../constants/alert";
 import autobind from "class-autobind";
 import { 
-  requestTodayTaskURL, 
   requestUpcomingTask, 
-  requestCheckAttendanceForTask 
+  requestCheckAttendanceForTask, 
+  requestTaskByDateURL
 } from "../../apis/taskAPI";
 import axios from "axios";
 import BackgroundTimer from "react-native-background-timer";
 import TaskTodayView from "./taskToday";
 import TaskUpcomingView from "./taskUpcoming";
 import firebase from "react-native-firebase";
-
 import { Navigation } from "react-native-navigation";
 import { TASK_SCREEN } from "../../constants/screen";
 
@@ -59,6 +46,9 @@ class TaskEmployee extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      selectedDate: "",
+      todayDate: "",
+      leftButtonText: "",
       listTaskNotStart : [], 
       listTaskInProgress: [],
       listTaskCompleted: [],
@@ -75,45 +65,37 @@ class TaskEmployee extends Component {
       upcomingTaskData : []
     }
     autobind(this)
+    //this.navigationEventListener = Navigation.events().bindComponent(this)
   }
 
   async componentDidMount() {
     this.navigationEventListener = Navigation.events().bindComponent(this);
-    const token = await AsyncStorage.getItem(TOKEN) 
+    const token = await AsyncStorage.getItem(commons.TOKEN) 
+    //console.log("token: ", token)
     this.setState({userToken: token})
-    this._getTodayTask()
+    this._getTaskByDate()
     this._getUpcomingTask()
-    BackgroundTimer.runBackgroundTimer(() => { 
-      console.log('list task not start: ', this.state.listTaskNotStart)
-      if(typeof(this.state.listTaskNotStart !== undefined) &&
-        this.state.listTaskNotStart.length !== 0) {
-        this.state.listTaskNotStart.forEach((task) => {
-          if (this._checkConditionForCheckAttendance(task)
-              && !this.state.listWaitCheckAttendance.includes(task)){
-              this.state.listWaitCheckAttendance.push(task)
-          }
-        }) 
-         console.log('list wait',this.state.listWaitCheckAttendance)
-          this._checkGateStatus()
-        }
-    }, 
-      10000
-      //  60000 // = 1 mins
-    ); 
-    firebase.notifications().onNotification((notification) => {
-       this._getTodayTask()
+    this._activateBackgroundTimer() 
+    firebase.notifications().onNotification(() => {
+       this._getTaskByDate()
     })
     Navigation.events().registerCommandListener((name, params) => {
       //console.log("name: ", name)
       if (name === "popTo" && params.componentId === TASK_SCREEN.id) {
-        this._getTodayTask()
+        this._getTaskByDate()
       }
     });
   } 
 
+  navigationButtonPressed({ buttonId }) {
+    if (buttonId === "CALENDAR_ICON") {
+      this._openDatePicker()
+    }
+  }
+
   async componentWillMount() {
-    axios.defaults.headers.common[CONTENT_TYPE] = "application/json"
-    axios.defaults.headers.common[AUTHORIZATION] =await AsyncStorage.getItem(TOKEN)
+    axios.defaults.headers.common[commons.CONTENT_TYPE] = "application/json"
+    axios.defaults.headers.common[commons.AUTHORIZATION] = await AsyncStorage.getItem(commons.TOKEN)
     NetInfo.isConnected.addEventListener('connectionChange', (connectionType) => {
        if (!connectionType) {
          this.setState({
@@ -125,23 +107,75 @@ class TaskEmployee extends Component {
          })
        }
     })
+    const today = moment(new Date()).format("YYYY-MM-DD")
+    this.setState({
+      selectedDate: today, 
+      todayDate: today
+    })
   }
 
-  _getTodayTask() {
-    if (this.props.userId !== undefined) {
-      axios.get(requestTodayTaskURL(this.props.userId), { }).then(res => {
-        //console.log('res: ', res.data)
+  _activateBackgroundTimer() {
+    BackgroundTimer.runBackgroundTimer(() => { 
+      console.log('list task not start: ', this.state.listTaskNotStart)
+      if(typeof(this.state.listTaskNotStart !== undefined) &&
+        this.state.listTaskNotStart.length !== 0) {
+        this.state.listTaskNotStart.forEach((task) => {
+          if (this._checkConditionForCheckAttendance(task)
+              && !this.state.listWaitCheckAttendance.includes(task)){
+              this.state.listWaitCheckAttendance.push(task)
+          }
+        }) 
+      console.log('list wait',this.state.listWaitCheckAttendance)
+      this._checkGateStatus()
+      }
+    }, 10000); //10 secs 
+  }
+
+  async _openDatePicker() {
+    try {
+      const {action, year, month, day} = await DatePickerAndroid.open({
+        date: new Date(this.state.selectedDate),
+        maxDate: new Date(this.state.todayDate)
+      });
+      if (action === DatePickerAndroid.dateSetAction) {
+        // console.log(year + "/" + month + "/" + day)
+        var selected = year + "-" + (month + 1) + "-" + day
+        if (!moment(selected).isSame(this.state.selectedDate)) {
+          this.setState({
+            selectedDate: selected
+          })
+          this._getTaskByDate()
+          if (moment(this.state.selectedDate).isBefore(this.state.todayDate)) {
+            BackgroundTimer.stopBackgroundTimer()
+          } 
+          else if (moment(this.state.selectedDate).isSame(this.state.todayDate)) {
+            this._activateBackgroundTimer()
+          }
+        }
+      }
+    } catch ({code, message}) {
+      console.warn('Cannot open date picker', message);
+    }
+  }
+
+  _getTaskByDate() {
+    if (this.props.userId !== undefined) { 
+      //console.log("today: ", today)
+      var leftButton = moment(this.state.selectedDate).isSame(this.state.todayDate) ? commons.TODAY : moment(this.state.selectedDate).format("DD/MM/YYYY")
+      axios.get(requestTaskByDateURL(this.props.userId, this.state.selectedDate), {}).then(res => {
+        console.log('result day: ' + this.state.selectedDate, res.data)
         this.setState({
-          listWaitCheckAttendance :[],
-          listTaskNotStart: this._loadListTaskByStatus(TASK_NOT_START, res.data),
-          listTaskInProgress: this._loadListTaskByStatus(TASK_IN_PROGRESS, res.data),
-          listTaskCompleted: this._loadListTaskByStatus(TASK_COMPLETED, res.data),
-          listTaskPendingApproval: this._loadListTaskByStatus(TASK_WAITING_FOR_APPROVE, res.data),
-          listTaskAbsent: res.data.filter(t => t.attendanceStatus === ABSENT)
+          leftButtonText: leftButton,
+          listWaitCheckAttendance: [],
+          listTaskNotStart: this._loadListTaskByStatus(commons.TASK_NOT_START, res.data),
+          listTaskInProgress: this._loadListTaskByStatus(commons.TASK_IN_PROGRESS, res.data),
+          listTaskCompleted: this._loadListTaskByStatus(commons.TASK_COMPLETED, res.data),
+          listTaskPendingApproval: this._loadListTaskByStatus(commons.TASK_WAITING_FOR_APPROVE, res.data),
+          listTaskAbsent: res.data.filter(t => t.attendanceStatus === commons.ABSENT)
         })
       }).catch(err => {
         //console.log("err at get today task: ", err)
-        ToastAndroid.showWithGravity(ERR_SERVER_ERROR,ToastAndroid.SHORT,ToastAndroid.BOTTOM)
+        ToastAndroid.showWithGravity(ERR_SERVER_ERROR, ToastAndroid.SHORT,ToastAndroid.BOTTOM)
       })
     }
   }
@@ -162,7 +196,7 @@ class TaskEmployee extends Component {
 
   _returnEachDataForTimeLine(task) {
     return {
-      time: moment(task.startTime).format(HOUR_FORMAT) + "\n" + moment(task.endTime).format(HOUR_FORMAT), 
+      time: moment(task.startTime).format(commons.HOUR_FORMAT) + "\n" + moment(task.endTime).format(commons.HOUR_FORMAT), 
       title: task.title, 
       id: task.id,
       description: "Mô tả: " + task.description + "\n" + "Tại công ty: " + task.companyDTO.name,
@@ -207,25 +241,27 @@ class TaskEmployee extends Component {
   }
 
   _loadListTaskByStatus = (statusId, listTotalTask) => {
-    return listTotalTask.filter(t => t.status === statusId && t.attendanceStatus !== ABSENT)
+    return listTotalTask.filter(t => 
+      t.status === statusId && t.attendanceStatus !== commons.ABSENT
+    )
   }
 
   _checkConditionForCheckAttendance = (task) => {
     const tComparedStart = this._compareTimeToCurrent(task.startTime)
     const tComparedEnd = this._compareTimeToCurrent(task.endTime)
 
-      if (tComparedStart <= TIME_ATTENDANCE_AVAILABLE) {
+      if (tComparedStart <= commons.TIME_ATTENDANCE_AVAILABLE) {
         //console.log('tcompared start ', tComparedStart + ' start time task ',task.startTime)
         //console.log('tcompared end ', tComparedEnd + ' start time task ',task.startTime)
-        if(tComparedEnd <= TIME_ATTENDANCE_AVAILABLE){
+        if (tComparedEnd <= commons.TIME_ATTENDANCE_AVAILABLE){
             //check absent for task 
           axios.put(requestCheckAttendanceForTask(task.id), {},{
-          }).then(t =>{
+          }).then(t => {
             this.state.listCheckedAttendance.push(task)
             this._removeTaskCheckedAttendance()
           }) 
           return false;
-        }else{
+        } else {
           return true
         }
       }
@@ -237,7 +273,7 @@ class TaskEmployee extends Component {
   _updateIndex(selectedIndex) {
     switch(selectedIndex) {
       case 0: 
-        this._getTodayTask()
+        this._getTaskByDate()
         break;
       case 1:
         this._getUpcomingTask()
@@ -270,7 +306,7 @@ class TaskEmployee extends Component {
      this.state.listCheckedAttendance = []
 
      if(this.state.listTaskNotStart.length === 0){
-      await Beacons.stopRangingBeaconsInRegion(IBEACONS) 
+      await Beacons.stopRangingBeaconsInRegion(commons.IBEACONS) 
       //console.log('da dong gate do list not start empty')
     }
     //console.log('remove : list not start after removed',this.state.listTaskNotStart)
@@ -280,9 +316,9 @@ class TaskEmployee extends Component {
   if(this.state.listWaitCheckAttendance.length > 0) {
     Beacons.detectIBeacons()
     try {
-       await Beacons.startRangingBeaconsInRegion(IBEACONS)
+       await Beacons.startRangingBeaconsInRegion(commons.IBEACONS)
        //console.log(`Beacons ranging started succesfully!`)
-       DeviceEventEmitter.addListener(BEACON_DID_RANGE, data => {
+       DeviceEventEmitter.addListener(commons.BEACON_DID_RANGE, data => {
          //console.log('beacon found: ', data)
          // list
          const beaconLists = data.beacons
@@ -297,11 +333,11 @@ class TaskEmployee extends Component {
                axios.put(requestCheckAttendanceForTask(task.id), {},{
                }).then(t => {
                  let localNoti = new firebase.notifications.Notification()
-                       .setNotificationId(CHECK_IN_BEACON_ID)
+                       .setNotificationId(commons.CHECK_IN_BEACON_ID)
                        .setTitle(CHECK_IN_SUCCESS)
                        .setBody(CHECK_ATTEND_SUCESSFUL)
-                       .android.setChannelId(CHANNEL_NOTIFICATION_OEM)
-                       .android.setSmallIcon(IC_LAUNCHER)
+                       .android.setChannelId(commons.CHANNEL_NOTIFICATION_OEM)
+                       .android.setSmallIcon(commons.IC_LAUNCHER)
                      let date = new Date();
                      date.setSeconds(date.getSeconds() + 2);
                      //console.log('date after set mins : ', date)
@@ -309,7 +345,7 @@ class TaskEmployee extends Component {
                      firebase.notifications().scheduleNotification(localNoti, {
                        fireDate: date.getTime(),
                      })
-                   this._getTodayTask()
+                   this._getTaskByDate
                    Vibration.vibrate(700)
                    //Alert.alert(NOTIFICATION, CHECK_ATTEND_SUCESSFUL)
                })
@@ -324,10 +360,9 @@ class TaskEmployee extends Component {
        })
       //console.log('Enter beacon check !')
       //console.log(`Beacons ranging started succesfully!`)
-      
       //DeviceEventEmitter.removeAllListeners
      // console.log('done start gate')
-    }catch (err) {
+    } catch (err) {
       console.log(`Beacons ranging not started, error: ${error}`)
       console.log('da dong gate list wait empty')
     }
@@ -335,7 +370,7 @@ class TaskEmployee extends Component {
     //await DeviceEventEmitter.emit('beaconsDidRange')
     //DeviceEventEmitter.removeListener('beaconsDidRange')
     console.log('gate closed')
-    await Beacons.stopRangingBeaconsInRegion(IBEACONS)
+    await Beacons.stopRangingBeaconsInRegion(commons.IBEACONS)
   }}
 
   _renderTodayTask() {
@@ -362,7 +397,7 @@ class TaskEmployee extends Component {
   _onRefresh = () => {
     this.setState({refreshing: true});
     if (this.state.selectedIndex === 0) {
-      this._getTodayTask()
+      this._getTaskByDate()
     } else {
       this._getUpcomingTask() 
     }
@@ -373,7 +408,7 @@ class TaskEmployee extends Component {
   
   //render view 
   render() {
-    const buttons = [TODAY, UPCOMING] 
+    const buttons = [this.state.leftButtonText, commons.UPCOMING] 
     return (
       <View style={{
         height: (this.state.selectedIndex === 0) ? DEVICE_HEIGHT - 100 : DEVICE_HEIGHT

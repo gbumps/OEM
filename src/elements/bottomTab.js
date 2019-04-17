@@ -8,6 +8,7 @@ import {
 import renderTopTab from "./topTab";
 import renderStatusBar from "./statusBar";
 import renderBottomTabIcon from "./bottomTabIcon";
+import { RED } from "../constants/common";
 
 export default renderBottomTab = (passProp) => ({
     children: [{
@@ -19,7 +20,15 @@ export default renderBottomTab = (passProp) => ({
               name: TASK_SCREEN.settingName,
               options: {
                 statusBar: renderStatusBar(true),
-                topBar: renderTopTab(TASK_SCREEN), 
+                topBar: //renderTopTab(TASK_SCREEN),
+                {
+                  ...renderTopTab(TASK_SCREEN), 
+                  rightButtons: [{
+                    id: "CALENDAR_ICON",
+                    icon: require("../../src/assets/icon/calendar.png"),
+                    color: RED
+                  }]
+                },
                 bottomTab: renderBottomTabIcon(TASK_SCREEN)
               },
               passProps: passProp

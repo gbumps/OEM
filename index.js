@@ -25,6 +25,8 @@ import {
 } from "./src/constants/common";
 import firebase from "react-native-firebase";
 import { checkSession } from "./src/functions/functions";
+import { updateNotification } from "./src/apis/notificationAPI";
+import axios from "axios";
 
 registerScreen();
 
@@ -94,7 +96,7 @@ Navigation.events().registerAppLaunchedListener(async() => {
   
   const userId = await AsyncStorage.getItem(USER.ID),
         token  = await AsyncStorage.getItem(TOKEN) 
-  console.log('token: ', token)
+  //console.log('token: ', token)
   await AsyncStorage.multiRemove([
     TASK_REPORT_PROBLEM_TEMP, 
     TASK_IN_PROGRESS_TEMP_ID, 
@@ -165,6 +167,14 @@ Navigation.events().registerAppLaunchedListener(async() => {
       {
         text: SEE_TASK,
         onPress: () => {
+          axios({ 
+            url: updateNotification(notification.data.notify_id),
+            method: "PUT",
+            data:{
+              key: "seen",
+              value: true
+            },
+          })
           Navigation.showModal({
             component: {
               name: TASK_INFO_SCREEN.settingName,

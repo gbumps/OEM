@@ -143,7 +143,7 @@ export default class Maps extends Component {
    
 
   _renderMarker(listMark) {
-    console.log('maker: ',listMark)
+    //console.log('maker: ',listMark)
     let listMarkers = [], listMarkColorByTime = [], endTimePrevious = 0
     Object.keys(listMark).map((key,index) => {
       let endPos = listMark[key].list.length - 1

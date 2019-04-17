@@ -1,7 +1,7 @@
 import baseURL from "./mainConnection";
 
-export const requestTodayTaskURL = (employeeID) => 
-  `${baseURL}/task/get-today-task?assigneeId=` + `${employeeID}`
+export const requestTaskByDateURL = (employeeID, date) => 
+  `${baseURL}/task/get-task-by-date?assigneeId=` + `${employeeID}` + `&date=` + `${date}`
 
 export const requestTaskDetailURL = (taskId) => 
   `${baseURL}/task/get-task-detail?taskId=` + `${taskId}`
