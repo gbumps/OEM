@@ -72,6 +72,10 @@ export const HELLO_HAVE_A_NICE_DAY = "Chúc bạn có một ngày làm việc vu
 
 export const listSuggestDescriptions = [
   "Tôi đã hoàn thành công việc",
+  "Khác"
+]
+
+export const listSuggestDescriptionsProblem = [
   "Tôi có vấn đề này",
   "Khác"
 ]

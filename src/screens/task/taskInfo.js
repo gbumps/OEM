@@ -29,6 +29,7 @@ import { Navigation } from "react-native-navigation";
 import Icon from "react-native-vector-icons/FontAwesome"
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import getDirections from 'react-native-google-maps-directions'
 import { fetchBaseColor } from "../../functions/functions";
@@ -299,8 +300,21 @@ class TaskInfo extends Component {
         }
       ]
     }
- 
     getDirections(data)
+  }
+
+  _renderTaskRating() {
+    let l = [];
+    if (this.state.task.rating === null) {
+      return l
+    }
+    for (var i = 0; i < this.state.task.rating;i++) {
+      l.push(<FontAwesome name="star" size={25} color={commons.YELLOW_ORANGE} style={{padding: 10}}/>)
+    }
+    for (var i = 0;i < 5 - this.state.task.rating; i++) {
+      l.push(<FontAwesome name="star-o" size={25} color={commons.YELLOW_ORANGE} style={{padding: 10}}/>)
+    }
+    return l
   }
 
   //render the full view of task detail
@@ -404,6 +418,12 @@ class TaskInfo extends Component {
             {this._handleLoadImage(this.state.imageReports)}
           </View>
             <View style={{padding: 15}}> 
+            <Text style={styles.title}>Đánh gía của quản lý: </Text> 
+               <View style={{flexDirection: "row", }}> 
+                  {this._renderTaskRating()}
+               </View>
+            </View>
+            <View style={{padding: 15}}> 
             <Text style={styles.title}>Nhận xét của quản lý: </Text> 
               <Text style={{ fontSize: 18, paddingLeft: 15 }}>
                 {this.state.reportCompleteEvaluation}
@@ -417,7 +437,7 @@ class TaskInfo extends Component {
           </View>
           <View>
             <View style={{flexDirection: "row", padding: 15}}> 
-              <Text style={styles.title}>Mô tả: </Text> 
+              <Text style={styles.title}> Mô tả: </Text> 
               <Text style={{ fontSize: 18 }}>
                 {this.state.descriptionProblem}
               </Text>
@@ -440,7 +460,6 @@ class TaskInfo extends Component {
           taskStatus =this.state.task.status,
           taskCheckList = this.state.task.checkList,
           taskAttendance = this.state.task.attendanceStatus
-          
     if(taskStatus === commons.TASK_NOT_START && taskAttendance !== commons.ABSENT) {
       Alert.alert(NOTIFICATION, ERR_TASK_NOT_START)
       return;
@@ -505,7 +524,7 @@ class TaskInfo extends Component {
         width:DEVICE_WIDTH,
         height: DEVICE_HEIGHT
     }}>
-      <ProgressBarAndroid animating={true} />
+      <ProgressBarAndroid animating={true}/>
     </View> : 
       <View style={{flex: 1}}>
         {
@@ -517,7 +536,7 @@ class TaskInfo extends Component {
               </Text>
            </View>
             : 
-           <View>
+            <View style={{height: DEVICE_HEIGHT - 55}}>
             <View style={{height: DEVICE_HEIGHT - 100}}>
               <CollapsingToolbar 
                 leftItem={<Ionicons name="md-arrow-round-back" size={25} color={baseColor} />}
@@ -544,7 +563,7 @@ class TaskInfo extends Component {
                 <Text style={{color: "white", fontSize: 20}}>HOÀN THÀNH</Text>
               </TouchableOpacity> 
             </View>
-          </View>
+            </View>
         }
     </View>
     )
@@ -566,33 +585,33 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'space-between',
     flexDirection: 'column'
- },
- taskName: {
-    fontFamily: "Roboto-Black",
-    fontSize: 35,
-    padding: 20
- },
- title: {
-  fontFamily:'Roboto-Bold',
-  fontSize: 17,
-  paddingLeft: 15
-},
-titleContainer: {
-  flexDirection: 'row',
-  padding: 15,
-  borderBottomColor: '#CCCCCC', 
-  borderBottomWidth: 0.7,
-  elevation: 0
-},
- buttonText: {
-  fontFamily: 'Lato-Bold',
-  fontSize: 16
- },
-buttonCompleteComponent: {
-  position:'absolute',
-  bottom:0,
-  alignSelf:'center',
-  width: DEVICE_WIDTH
+  },
+  taskName: {
+     fontFamily: "Roboto-Black",
+     fontSize: 35,
+     padding: 20
+  },
+  title: {
+   fontFamily:'Roboto-Bold',
+   fontSize: 17,
+   paddingLeft: 15
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    padding: 15,
+    borderBottomColor: '#CCCCCC', 
+    borderBottomWidth: 0.7,
+    elevation: 0
+  },
+   buttonText: {
+    fontFamily: 'Lato-Bold',
+    fontSize: 16
+   },
+  buttonCompleteComponent: {
+    position:'absolute',
+    bottom: 0,
+    alignSelf:'center',
+    width: DEVICE_WIDTH
   },
   buttonComplete: {
     alignItems: "center",

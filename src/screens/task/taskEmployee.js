@@ -50,6 +50,7 @@ class TaskEmployee extends Component {
       todayDate: "",
       leftButtonText: "",
       listTaskNotStart : [], 
+      listTaskNotStartToday: [],
       listTaskInProgress: [],
       listTaskCompleted: [],
       listTaskAbsent: [],
@@ -85,7 +86,7 @@ class TaskEmployee extends Component {
         this._getTaskByDate()
       }
     });
-  } 
+  }
 
   navigationButtonPressed({ buttonId }) {
     if (buttonId === "CALENDAR_ICON") {
@@ -116,10 +117,10 @@ class TaskEmployee extends Component {
 
   _activateBackgroundTimer() {
     BackgroundTimer.runBackgroundTimer(() => { 
-      console.log('list task not start: ', this.state.listTaskNotStart)
-      if(typeof(this.state.listTaskNotStart !== undefined) &&
-        this.state.listTaskNotStart.length !== 0) {
-        this.state.listTaskNotStart.forEach((task) => {
+      console.log('list task not start today: ', this.state.listTaskNotStartToday)
+      if(typeof(this.state.listTaskNotStartToday !== undefined) &&
+        this.state.listTaskNotStartToday.length !== 0) {
+        this.state.listTaskNotStartToday.forEach((task) => {
           if (this._checkConditionForCheckAttendance(task)
               && !this.state.listWaitCheckAttendance.includes(task)){
               this.state.listWaitCheckAttendance.push(task)
@@ -133,10 +134,17 @@ class TaskEmployee extends Component {
 
   async _openDatePicker() {
     try {
-      const {action, year, month, day} = await DatePickerAndroid.open({
-        date: new Date(this.state.selectedDate),
-        maxDate: new Date(this.state.todayDate)
-      });
+      var currentDate = new Date()
+      const {action, year, month, day} = await DatePickerAndroid.open( 
+        (this.state.selectedIndex === 0) ? 
+        {
+          date: new Date(this.state.selectedDate),
+          maxDate: new Date(this.state.todayDate)
+        } : {
+          date: new Date(this.state.selectedDate),
+          minDate: currentDate.setDate(currentDate.getDate() + 1) 
+        }
+      );
       if (action === DatePickerAndroid.dateSetAction) {
         // console.log(year + "/" + month + "/" + day)
         var selected = year + "-" + (month + 1) + "-" + day
@@ -145,12 +153,6 @@ class TaskEmployee extends Component {
             selectedDate: selected
           })
           this._getTaskByDate()
-          if (moment(this.state.selectedDate).isBefore(this.state.todayDate)) {
-            BackgroundTimer.stopBackgroundTimer()
-          } 
-          else if (moment(this.state.selectedDate).isSame(this.state.todayDate)) {
-            this._activateBackgroundTimer()
-          }
         }
       }
     } catch ({code, message}) {
@@ -167,12 +169,15 @@ class TaskEmployee extends Component {
         this.setState({
           leftButtonText: leftButton,
           listWaitCheckAttendance: [],
+          listCheckedAttendance: [],
+          listTaskNotStartToday: (moment(this.state.selectedDate).isSame(this.state.todayDate)) ? this._loadListTaskByStatus(commons.TASK_NOT_START, res.data) : this.state.listTaskNotStartToday,
           listTaskNotStart: this._loadListTaskByStatus(commons.TASK_NOT_START, res.data),
           listTaskInProgress: this._loadListTaskByStatus(commons.TASK_IN_PROGRESS, res.data),
           listTaskCompleted: this._loadListTaskByStatus(commons.TASK_COMPLETED, res.data),
           listTaskPendingApproval: this._loadListTaskByStatus(commons.TASK_WAITING_FOR_APPROVE, res.data),
           listTaskAbsent: res.data.filter(t => t.attendanceStatus === commons.ABSENT)
         })
+        
       }).catch(err => {
         //console.log("err at get today task: ", err)
         ToastAndroid.showWithGravity(ERR_SERVER_ERROR, ToastAndroid.SHORT,ToastAndroid.BOTTOM)
@@ -297,7 +302,7 @@ class TaskEmployee extends Component {
 
   async _removeTaskCheckedAttendance(){
    //console.log('remove: list checked before remove',this.state.listCheckedAttendance)
-     this.state.listTaskNotStart.forEach((task,index,arrayNotStart) => {
+     this.state.listTaskNotStartToday.forEach((task,index,arrayNotStart) => {
         if (this.state.listCheckedAttendance.includes(task)) {
           arrayNotStart.splice(index,1)
         }
@@ -305,7 +310,7 @@ class TaskEmployee extends Component {
     
      this.state.listCheckedAttendance = []
 
-     if(this.state.listTaskNotStart.length === 0){
+     if(this.state.listTaskNotStartToday.length === 0){
       await Beacons.stopRangingBeaconsInRegion(commons.IBEACONS) 
       //console.log('da dong gate do list not start empty')
     }

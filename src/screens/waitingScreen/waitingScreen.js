@@ -16,7 +16,7 @@ export default class WaitingScreen extends Component {
             flex: 1,
             backgroundColor: "transparent", 
             justifyContent: "center", 
-            alignItems: "center",
+            alignSelf: "center",
             width:DEVICE_WIDTH,
             height: DEVICE_HEIGHT
           }}>

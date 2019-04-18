@@ -93,10 +93,9 @@ Navigation.setDefaultOptions({
 //when app start, set root screens
 Navigation.events().registerAppLaunchedListener(async() => {
   checkSession()
-  
   const userId = await AsyncStorage.getItem(USER.ID),
         token  = await AsyncStorage.getItem(TOKEN) 
-  //console.log('token: ', token)
+  console.log('token: ', token)
   await AsyncStorage.multiRemove([
     TASK_REPORT_PROBLEM_TEMP, 
     TASK_IN_PROGRESS_TEMP_ID, 

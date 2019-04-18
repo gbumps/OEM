@@ -43,7 +43,6 @@ class TaskSubmitReport extends Component {
      description: "",
      reportType: "",
      taskCheckList: [],
-     editable: false,
      reportFunctionsView: "flex",
      listSuggestDescriptionCheck: [true, false, false]
    }
@@ -80,7 +79,7 @@ class TaskSubmitReport extends Component {
   async componentWillMount() {
     axios.defaults.headers.common[commons.AUTHORIZATION] =await AsyncStorage.getItem(commons.TOKEN)
     const {reportType, taskId, taskStatus, taskCheckList} = this.props
-    console.log("props: ", this.props)
+    //console.log("props: ", this.props)
     const tempWorkReport = await Promise.all([
       AsyncStorage.getItem(commons.TASK_IN_PROGRESS_TEMP_ID),
       AsyncStorage.getItem(commons.TASK_REPORT_WORK_TEMP),
@@ -117,10 +116,6 @@ class TaskSubmitReport extends Component {
     })
   }
   
-  async componentDidMount() {
-
-  }
-
   _createFormData(uri) { 
       const formData = new FormData();
       formData.append('dataFile', {
@@ -137,7 +132,6 @@ class TaskSubmitReport extends Component {
         name: LOADING_SCREEN.settingName,
       }, 
     })
-    
     const userId = await AsyncStorage.getItem(commons.USER.ID)
     const imageUrls = await Promise.all(
       this.state.imgUris.map(async (uri) => {
@@ -152,9 +146,9 @@ class TaskSubmitReport extends Component {
           'Content-Type': 'multipart/form-data',
         }
       });
-      return response.data;
+      //console.log("response data: ", response.data)
+      return response.data; 
     }));
-    
     const photoString = imageUrls.join("; ")
     const submitLink = submitReportAPI();
     axios({
@@ -274,7 +268,6 @@ class TaskSubmitReport extends Component {
     return( 
       <View style={styles.container}>
         <TextInput style={styles.textDescription}
-          editable= { this.state.editable }
           onChangeText={(text) => {
             this.setState({
               description: text
@@ -285,23 +278,23 @@ class TaskSubmitReport extends Component {
         />
         <View> 
           {
-            commons.listSuggestDescriptions.map((t,i) => {
+            (this.state.reportType === 1 ? 
+            commons.listSuggestDescriptions : 
+            commons.listSuggestDescriptionsProblem).map((t,i) => {
               return (
                 <CheckBox containerStyle={styles.checkBoxContainer} 
                   title={t}
                   onPress={() => {
                     this.state.listSuggestDescriptionCheck.fill(false)
                     this.state.listSuggestDescriptionCheck[i] = true
-                    if (t == commons.listSuggestDescriptions[2]) {
+                    if (t == commons.listSuggestDescriptions[1]) {
                       this.setState({
-                        editable: true,
                         description: "",
                         listSuggestDescriptionCheck: this.state.listSuggestDescriptionCheck
                       })
                     }
                     else {
                       this.setState({
-                        editable: false,
                         description: t,
                         listSuggestDescriptionCheck: this.state.listSuggestDescriptionCheck
                       })
@@ -333,7 +326,7 @@ class TaskSubmitReport extends Component {
                       imgUris: this.state.imgUris
                     })
                   }}/>
-                )) }
+                ))}
           </ScrollView>
           <View style={[{ display: this.state.reportFunctionsView }, styles.reportFunctionView]}> 
             <View style={styles.cameraBtnComponent}>
