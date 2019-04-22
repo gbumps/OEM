@@ -142,6 +142,14 @@ Navigation.events().registerAppLaunchedListener(async() => {
     //if app opened as usual way will received undefined
     const notification = notificationOpen.notification;
     //auto navigate to task info
+    axios({ 
+      url: updateNotification(notification.data.notify_id),
+      method: "PUT",
+      data:{
+        key: "seen",
+        value: true
+      },
+    })
     Navigation.showModal({
       component: {
         name: TASK_INFO_SCREEN.settingName,

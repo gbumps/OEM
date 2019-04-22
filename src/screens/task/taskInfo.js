@@ -317,6 +317,27 @@ class TaskInfo extends Component {
     return l
   }
 
+  _renderOptionTopBarForReport(type, component) {
+    return {
+      visible: true,
+      noBorder: true,
+      title: {
+        color: (type === 1) ? baseColor : commons.RED,
+        text: component.vnName,
+        fontFamily: 'Roboto-Bold',
+        fontSize: 28
+      },
+      backButton: {
+        showTitle: false,
+        color: baseColor
+      }, 
+      elevation: 0,
+      background: {
+        color: 'white',
+      }
+    }
+  }
+
   //render the full view of task detail
   _renderTaskDetailView(taskDetail) {
     if (Object.keys(taskDetail).length === 0){
@@ -340,8 +361,32 @@ class TaskInfo extends Component {
         <Text style={[styles.taskName, {
           color:  (taskDetail.attendanceStatus === commons.ABSENT) ? 
           "#f43030" : fetchBaseColor(this.state.task.status)}]}>
-          {taskDetail.title}
+          {taskDetail.id + " - " + taskDetail.title}
         </Text>
+        <TouchableOpacity onPress={() => this.setState({
+          showImageWorkplace: this.state.showImageWorkplace === 'none' ? 'flex' : 'none'
+        })}>
+          <View style={styles.titleContainer}>
+            <Icon name="building-o" size={25} color="#007bff" />
+            <Text style={styles.title}>
+              {taskDetail.workplace.name}
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <View style={{ display: this.state.showImageWorkplace }}> 
+          <Image 
+            source={{
+               uri: (taskDetail.workplace.picture === "") ? 
+               commons.NO_IMAGE:
+               taskDetail.workplace.picture }}
+            style={{width: DEVICE_WIDTH, height: 200}}/>
+        </View>
+        <TouchableOpacity onPress={ this.handleGetDirections }>
+        <View style={styles.titleContainer}>
+          <FontAwesome5 name="location-arrow" size={25} color="#dc3545" />
+          <Text style={styles.title}> Chỉ đường tới công ty </Text>
+        </View>
+        </TouchableOpacity>
         <View style={styles.titleContainer}>
           <Icon name="calendar" size={25} color="#a900c6" />
           <Text style={styles.title}>
@@ -351,12 +396,6 @@ class TaskInfo extends Component {
             workDate.getFullYear() }
           </Text>
         </View>
-        <TouchableOpacity onPress={ this.handleGetDirections }>
-        <View style={styles.titleContainer}>
-          <FontAwesome5 name="location-arrow" size={25} color="#dc3545" />
-          <Text style={styles.title}> Chỉ đường tới công ty </Text>
-        </View>
-        </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Icon name="clock-o" size={25} color="#dc3545" />
             <Text style={styles.title}>
@@ -377,24 +416,6 @@ class TaskInfo extends Component {
           <Text style={styles.taskDetailDescriptionStyle}>
           {(taskDetail.description.length === 0) ? commons.NO_DETAIL : taskDetail.description }
           </Text>
-        </View>
-        <TouchableOpacity onPress={() => this.setState({
-          showImageWorkplace: this.state.showImageWorkplace === 'none' ? 'flex' : 'none'
-        })}>
-          <View style={styles.titleContainer}>
-            <Icon name="building-o" size={25} color="#007bff" />
-            <Text style={styles.title}>
-              {taskDetail.workplace.name}
-            </Text>
-          </View>
-        </TouchableOpacity>
-        <View style={{ display: this.state.showImageWorkplace }}> 
-          <Image 
-            source={{
-               uri: (taskDetail.workplace.picture === "") ? 
-               commons.NO_IMAGE:
-               taskDetail.workplace.picture }}
-            style={{width: DEVICE_WIDTH, height: 200}}/>
         </View>
         <View style={[styles.titleContainer]}>
           <Icon name="list-ol" size={25} color={commons.YELLOW_ORANGE} />
@@ -487,12 +508,13 @@ class TaskInfo extends Component {
           navigateFrom: this.props.navigateFrom
         },
         options: {
-          topBar: renderTopTab((type === 1) ? TASK_REPORT_SCREEN : TASK_REPORT_PROBLEM_SCREEN), 
+          topBar: this._renderOptionTopBarForReport(type, (type === 1) ? TASK_REPORT_SCREEN : TASK_REPORT_PROBLEM_SCREEN), 
           bottomTabs: {
             visible: false
           }
         }
-    }})
+      }
+    })
   }
 
   _handlePop() {

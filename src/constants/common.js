@@ -38,6 +38,7 @@ export const FRIDAY = "Thứ 6"
 export const SATURDAY = "Thứ 7"
 export const SUNDAY = "Chủ Nhật"
 export const HOUR_FORMAT = "HH:mm"
+export const DATE_FORMAT = "YYYY-MM-DD"
 
 export const RETYPE_OLD_PASS = "Nhập mật khẩu cũ" 
 export const TYPE_NEW_PASS = "Nhập mật khẩu mới"

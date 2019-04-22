@@ -106,10 +106,10 @@ class TaskTodayView extends Component {
                <Text style={styles.title}> Đang chờ duyệt </Text>
               </View>
               <View> 
-               <Badge status="primary" value={this.props.listTaskPendingApproval.length} 
-                      textStyle={{color: "white"}}
-                      badgeStyle={this._returnBadgeStyle(baseColor)}
-               />
+                <Badge status="primary" value={this.props.listTaskPendingApproval.length} 
+                       textStyle={{color: "white"}}
+                       badgeStyle={this._returnBadgeStyle(baseColor)}
+                />
               </View>
             </View>
           </TouchableOpacity>
@@ -122,12 +122,12 @@ class TaskTodayView extends Component {
             <View style={styles.titleTodayTask}>
               <View style={{flexDirection: "row"}}>
               <Icon name="power-off" size={25} color={GREY} />
-               <Text style={styles.title}> Chưa bắt đầu </Text>
+                <Text style={styles.title}> Chưa bắt đầu </Text>
               </View>
               <View>
-               <Badge status="primary" value={this.props.listTaskNotStart.length} 
-                      textStyle={{color: "white"}}
-                      badgeStyle={this._returnBadgeStyle("#aaaaaa")} />
+              <Badge status="primary" value={this.props.listTaskNotStart.length} 
+                     textStyle={{color: "white"}}
+                     badgeStyle={this._returnBadgeStyle("#aaaaaa")} />
               </View>
             </View>
             </TouchableOpacity>

@@ -5,9 +5,10 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Image
 } from 'react-native';
 import { 
-  HOUR_FORMAT, GREEN, 
+  HOUR_FORMAT, GREEN, RED, 
 } from "../../constants/common";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import moment from "moment";
@@ -16,7 +17,7 @@ import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSett
 import { TASK_SCREEN, TASK_INFO_SCREEN } from "../../constants/screen";
 import { Navigation } from "react-native-navigation";
 import PropTypes from 'prop-types';
-
+import autobind from "class-autobind";
 
 
 export default class TaskUpcomingView extends Component {
@@ -27,58 +28,85 @@ export default class TaskUpcomingView extends Component {
       upcomingTaskDateView: this.props.upcomingTaskDateView,
       upcomingTaskData : this.props.upcomingTaskData
     }
+    autobind(this)
   }
 
   
   _renderTimelineUpcomingTask() { 
     if(this.state.upcomingTaskData.length !== 0) {
      return (
-       <Timeline
-         style={styles.timeLine}
-         innerCircle={'icon'} 
-         circleSize={28}
-         circleColor={GREEN}
-         lineColor='#bcbcbc'
-         timeContainerStyle={{minWidth:52, marginTop: 1}}
-         timeStyle={styles.timeLineTimeStyle}
-         separator={true} 
-         onEventPress={(t) => {
-           Navigation.push(
-             TASK_SCREEN.id, {
-             component: {
-               id: TASK_INFO_SCREEN.id,
-               name: TASK_INFO_SCREEN.settingName,
-               passProps: {
-                 taskId: t.id,
-                 navigateFrom: TASK_SCREEN.id
-               }
-             }
-           })
-         }}
-         descriptionStyle={{color: 'gray'}}
-         options={{ style:{paddingTop:5} }}
-         data={this.state.upcomingTaskData}
-       />
-     )
+        <Timeline
+          innerCircle={'icon'} 
+          circleSize={28}
+          circleColor={GREEN}
+          lineColor='#bcbcbc'
+          timeContainerStyle={{minWidth:52, marginTop:1}}
+          timeStyle={styles.timeLineTimeStyle}
+          separator={true} 
+          onEventPress={(t) => {
+            Navigation.push(
+              TASK_SCREEN.id, {
+              component: {
+                id: TASK_INFO_SCREEN.id,
+                name: TASK_INFO_SCREEN.settingName,
+                passProps: {
+                  taskId: t.id,
+                  navigateFrom: TASK_SCREEN.id
+                }
+              }
+            })
+          }}
+          renderDetail={this._renderDetail}
+          descriptionStyle={{color: 'gray'}}
+          options={{style:{paddingTop:2}}}
+          data={this.state.upcomingTaskData}
+        />
+      )
     }
     else return(
-       <View style={styles.noWorkForThisDayContainer}>
+      <View style={styles.noWorkForThisDayContainer}>
         <Icon name="tasks" size={60} color="#ccc"/>
         <Text style={{ fontSize: 20 }}>
           Không có công việc cho ngày này
         </Text>
-       </View>
-   )
- }
+      </View>
+    )
+  }
+
+  _renderDetail(rowData) {
+    var desc = null
+    if(rowData.description && rowData.imageUrl)
+      desc = (
+         <View>
+            <Text style={[styles.title]}>{rowData.title}</Text>
+            <Text style={{color: baseColor, fontSize: 18, fontWeight: "bold"}}>{rowData.workplaceName}</Text>
+            <Text style={{color: RED, fontSize: 16, fontWeight: "bold"}}>{
+              rowData.companyDTO.length >= 15 ? 
+              rowData.companyDTO.substring(0,15) + "..." :
+              rowData.companyDTO 
+            }</Text>
+            <Text style={{fontSize: 13}}>{rowData.description}</Text>
+         </View>
+      )
+    
+    return (
+      <View style={styles.descriptionContainer}>
+        {desc}
+        <Image source={{uri: rowData.imageUrl}} style={styles.image}/>
+      </View>
+    )
+  }
 
  _returnEachDataForTimeLine(task) {
   return {
     time: moment(task.startTime).format(HOUR_FORMAT) + "\n" + moment(task.endTime).format(HOUR_FORMAT), 
-    title: task.title, 
+    title: "[" + task.id + "] " + task.title, 
     id: task.id,
-    description: "Mô tả: " + task.description + "\n" + "Tại công ty: " + task.companyDTO.name,
+    description: "Mô tả: " + task.description,
+    workplaceName: task.workplaceName,
+    companyDTO: task.companyDTO.name,
     circleColor: '#009688',
-    lineColor:'#009688',
+    imageUrl: task.companyDTO.picture 
   }
 }
 
@@ -88,9 +116,7 @@ export default class TaskUpcomingView extends Component {
      Object.keys(upcomingTasks).length === 0
    ) {  
      return (
-       <View>
-
-       </View>
+       <View/>
      )
    }
    else {
@@ -162,6 +188,26 @@ const styles = StyleSheet.create({
     color: baseColor,
     fontFamily: "Roboto-Bold",
     marginRight: 8
+  },
+  title:{
+    fontSize: 22,
+    fontWeight: "700" 
+  },
+  descriptionContainer:{
+    flexDirection: 'row',
+    paddingRight: 30,
+    justifyContent: "space-between", 
+    width: DEVICE_WIDTH - 100
+  },
+  textDescription: {
+    color: 'gray'
+  },
+  image:{
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignSelf: "center",
+    justifyContent: "center"
   },
   shadowStyle: {
     shadowColor: 'rgba(0, 0, 0, 0.16)',

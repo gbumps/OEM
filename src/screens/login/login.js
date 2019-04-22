@@ -1,5 +1,5 @@
 import React,{ Component } from "react";
-import { connect  } from "react-redux";
+import { connect } from "react-redux";
 import {
   KeyboardAvoidingView,
   Image,
@@ -98,12 +98,7 @@ class Login extends Component {
       welcomeText: arr[Math.floor(Math.random() * arr.length) + 0]
     })
     let macAddress = ""
-    if (Platform.OS === IOS) {
-      macAddress =  await DeviceInfo.getUniqueID()
-    } else {
-      macAddress = await DeviceInfo.getMACAddress()
-    }
-    //console.log("mac ios: ",macAddress)
+    macAddress = await DeviceInfo.getMACAddress()
     axios.get(requestPhoneNumber(macAddress)).then(phoneNumber => {
       if (phoneNumber.data === "") {
         let errMessage = (Platform.OS === IOS) ? 

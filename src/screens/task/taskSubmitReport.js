@@ -330,14 +330,18 @@ class TaskSubmitReport extends Component {
           </ScrollView>
           <View style={[{ display: this.state.reportFunctionsView }, styles.reportFunctionView]}> 
             <View style={styles.cameraBtnComponent}>
-            <TouchableOpacity onPress={ this._handlePressCamera }>
-              <Icon name="camera" size={30} color="white" />
-            </TouchableOpacity>
+              <TouchableOpacity onPress={ this._handlePressCamera }>
+                <Icon name="camera" size={30} color="white" />
+              </TouchableOpacity>
             </View>
-            <View style={styles.endButton}>
+            <View style={[styles.endButton, {
+              backgroundColor: this.state.reportType === 1 ? GREEN : commons.RED
+            }]}>
               <TouchableOpacity onPress={this._handleSubmitReport}> 
-                <Text style={{color: "white", fontSize: 20}}>
-                  {this.state.reportType === 1 ? commons.END_TASK : commons.REPORT_PROBLEM_NAME} 
+                <Text style={{color: "white", fontSize: 20, fontWeight: "bold"}}>
+                  {this.state.reportType === 1 ? 
+                  commons.END_TASK : 
+                  commons.REPORT_PROBLEM_NAME} 
                 </Text>
               </TouchableOpacity> 
               </View>
@@ -367,7 +371,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     margin: 2,
     padding: 10,
-    backgroundColor: "#00af63",
     width: DEVICE_WIDTH / 2 + 20,
     justifyContent: "center", 
     alignItems: "center"

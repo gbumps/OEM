@@ -80,7 +80,7 @@ export default TaskItem = (props) => (
          color: (props.attendance === ABSENT) ? 
          "#f43030" : fetchBaseColor(props.status)
        }]}>
-         {props.title}
+         {props.id + " - " + props.title}
        </Text>
        <View style={styles.taskEachInfo}>
          <Icon name="building" size={20} color="black"/>

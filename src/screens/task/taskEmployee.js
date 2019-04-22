@@ -60,13 +60,13 @@ class TaskEmployee extends Component {
       todayTasks: [],
       upcomingTasks: [],
       selectedIndex: 0,
+      upcomingTaskDate: "",
       upcomingTaskDateView: [],
       refreshing: false,
       networkState: "none",
       upcomingTaskData : []
     }
     autobind(this)
-    //this.navigationEventListener = Navigation.events().bindComponent(this)
   }
 
   async componentDidMount() {
@@ -108,16 +108,18 @@ class TaskEmployee extends Component {
          })
        }
     })
-    const today = moment(new Date()).format("YYYY-MM-DD")
+    const today = moment(new Date()).format(commons.DATE_FORMAT)
+          upcomingDate = moment(today).add(1, 'days').format(commons.DATE_FORMAT)
     this.setState({
       selectedDate: today, 
-      todayDate: today
+      todayDate: today,
+      upcomingTaskDate: upcomingDate
     })
   }
 
   _activateBackgroundTimer() {
     BackgroundTimer.runBackgroundTimer(() => { 
-      console.log('list task not start today: ', this.state.listTaskNotStartToday)
+      //console.log('list task not start today: ', this.state.listTaskNotStartToday)
       if(typeof(this.state.listTaskNotStartToday !== undefined) &&
         this.state.listTaskNotStartToday.length !== 0) {
         this.state.listTaskNotStartToday.forEach((task) => {
@@ -135,37 +137,51 @@ class TaskEmployee extends Component {
   async _openDatePicker() {
     try {
       var currentDate = new Date()
+      //alert("selected date: ", this.state.selectedDate)
       const {action, year, month, day} = await DatePickerAndroid.open( 
         (this.state.selectedIndex === 0) ? 
         {
           date: new Date(this.state.selectedDate),
           maxDate: new Date(this.state.todayDate)
         } : {
-          date: new Date(this.state.selectedDate),
-          minDate: currentDate.setDate(currentDate.getDate() + 1) 
+          date: new Date(this.state.upcomingTaskDate),
+          minDate: currentDate.setDate(currentDate.getDate() + 1)
         }
       );
-      if (action === DatePickerAndroid.dateSetAction) {
-        // console.log(year + "/" + month + "/" + day)
-        var selected = year + "-" + (month + 1) + "-" + day
-        if (!moment(selected).isSame(this.state.selectedDate)) {
-          this.setState({
-            selectedDate: selected
-          })
-          this._getTaskByDate()
+      if (action !== DatePickerAndroid.dismissedAction) {
+        let selected = new Date(year + "/" + (month + 1) + "/" + day)
+        switch(this.state.selectedIndex) {
+          case 0: 
+            if (!moment(selected).isSame(this.state.selectedDate)) {
+              this.setState({
+                selectedDate: moment(selected).format(commons.DATE_FORMAT)
+              })
+              this._getTaskByDate()
+            }
+            break;
+          case 1:
+            if (!moment(selected).isSame(this.state.upcomingTaskDate)) {
+              this.setState({
+                 upcomingTaskDate: moment(selected).format(commons.DATE_FORMAT) 
+              })
+              this._getUpcomingTask()
+            }
+            break;
         }
       }
     } catch ({code, message}) {
-      console.warn('Cannot open date picker', message);
+       alert("err at openning: ", message)
     }
   }
 
   _getTaskByDate() {
     if (this.props.userId !== undefined) { 
-      //console.log("today: ", today)
       var leftButton = moment(this.state.selectedDate).isSame(this.state.todayDate) ? commons.TODAY : moment(this.state.selectedDate).format("DD/MM/YYYY")
       axios.get(requestTaskByDateURL(this.props.userId, this.state.selectedDate), {}).then(res => {
         console.log('result day: ' + this.state.selectedDate, res.data)
+        // if (!moment(this.state.selectedDate).isValid()) {
+        //   alert(this.state.selectedDate + " is not valid !")
+        // }
         this.setState({
           leftButtonText: leftButton,
           listWaitCheckAttendance: [],
@@ -200,25 +216,26 @@ class TaskEmployee extends Component {
   }
 
   _returnEachDataForTimeLine(task) {
-    return {
-      time: moment(task.startTime).format(commons.HOUR_FORMAT) + "\n" + moment(task.endTime).format(commons.HOUR_FORMAT), 
-      title: task.title, 
-      id: task.id,
-      description: "Mô tả: " + task.description + "\n" + "Tại công ty: " + task.companyDTO.name,
-      circleColor: '#009688',
-      lineColor:'#009688',
-    }
-  } 
+  return {
+    time: moment(task.startTime).format(HOUR_FORMAT) + "\n" + moment(task.endTime).format(HOUR_FORMAT), 
+    title: task.title, 
+    id: task.id,
+    description: "Mô tả: " + task.description,
+    workplaceName: task.workplaceName,
+    companyDTO: task.companyDTO.name,
+    circleColor: '#009688',
+    imageUrl: task.companyDTO.picture 
+  }
+}
 
   _getUpcomingTask() {
     if(this.props.userId !== undefined) {
-      axios.get(requestUpcomingTask(this.props.userId),{}
+      axios.get(requestUpcomingTask(this.props.userId, this.state.upcomingTaskDate),{}
       ).then(res => {
         this.setState({
           upcomingTasks: res.data
         }) 
        }).catch(err => {
-          //console.log("err at get upcoming task: ", err)
           switch(err.response.status) {
             case 500: 
             case 502: 
