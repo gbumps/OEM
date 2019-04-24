@@ -11,7 +11,7 @@ import {
   ScrollView,
   ProgressBarAndroid
 } from 'react-native';
-import { CheckBox } from "react-native-elements";
+import { CheckBox, Badge } from "react-native-elements";
 import { 
   TASK_INFO_SCREEN, 
   TASK_REPORT_SCREEN, 
@@ -21,7 +21,6 @@ import {
   NOTIFICATION_SCREEN,
 } from "../../constants/screen";
 import renderStatusBar from "../../elements/statusBar";
-import renderTopTab from "../../elements/topTab";
 import renderBottomTabIcon from "../../elements/bottomTabIcon";
 import CollapsingToolbar from 'react-native-collapsingtoolbar';
 import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSetting";
@@ -36,7 +35,7 @@ import { fetchBaseColor } from "../../functions/functions";
 import moment from "moment";
 import * as commons from "../../constants/common";
 import axios from "axios";
-import { requestTaskDetailURL } from "../../apis/taskAPI";
+import { requestTaskDetailURL } from "../../api-service/taskAPI";
 import { 
   ERR_TASK_NOT_START, 
   NOTIFICATION, 
@@ -46,7 +45,7 @@ import {
 } from "../../constants/alert";
 import autobind from "class-autobind";
 import ImageInstance from "../../elements/imageInstance";
-import { getReport } from "../../apis/reportAPI";
+import { getReport } from "../../api-service/reportAPI";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
 const CheckBoxInstance = (props) => (
@@ -338,6 +337,20 @@ class TaskInfo extends Component {
     }
   }
 
+  _renderAttendanceStatus(status) {
+      switch(status) {
+        case 0: 
+          return {color: "primary", value: "Chưa điểm danh"}
+        case 1: 
+          return {color: "success", value: "Đúng giờ"}
+        case 2: 
+          return {color: "warning", value: "Trễ"}
+        case 3: 
+          return {color: "error", value: "Vắng mặt"}
+      }
+  }
+
+
   //render the full view of task detail
   _renderTaskDetailView(taskDetail) {
     if (Object.keys(taskDetail).length === 0){
@@ -381,11 +394,29 @@ class TaskInfo extends Component {
                taskDetail.workplace.picture }}
             style={{width: DEVICE_WIDTH, height: 200}}/>
         </View>
-        <TouchableOpacity onPress={ this.handleGetDirections }>
-        <View style={styles.titleContainer}>
-          <FontAwesome5 name="location-arrow" size={25} color="#dc3545" />
-          <Text style={styles.title}> Chỉ đường tới công ty </Text>
+        <View style={[styles.titleContainer, { justifyContent: "space-between" }] }>
+          <View style={{ flexDirection: "row" }}>
+            <FontAwesome5 name="calendar-check" size={25} color={commons.GREEN} />
+            <Text style={styles.title}>
+              Trạng thái điểm danh
+            </Text>
+          </View>
+          <Badge 
+            badgeStyle={{padding: 12}}
+            textStyle={{fontSize: 15, fontWeight: "bold"}}
+            value={this._renderAttendanceStatus(taskDetail.attendanceStatus).value}
+            status={this._renderAttendanceStatus(taskDetail.attendanceStatus).color}/>
         </View>
+        <View style={[styles.titleContainer]}> 
+          <Text style={[styles.title, {color: commons.YELLOW_ORANGE}]}>
+            {moment(taskDetail.checkInTime).format("HH:mm DD/MM/YYYY")}
+          </Text>
+        </View> 
+        <TouchableOpacity onPress={ this.handleGetDirections }>
+          <View style={styles.titleContainer}>
+            <FontAwesome5 name="location-arrow" size={25} color="#dc3545" />
+            <Text style={styles.title}> Chỉ đường tới công ty </Text>
+          </View>
         </TouchableOpacity>
         <View style={styles.titleContainer}>
           <Icon name="calendar" size={25} color="#a900c6" />
@@ -623,7 +654,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomColor: '#CCCCCC', 
     borderBottomWidth: 0.7,
-    elevation: 0
+    elevation: 0,
   },
    buttonText: {
     fontFamily: 'Lato-Bold',

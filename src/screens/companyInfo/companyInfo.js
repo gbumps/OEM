@@ -16,12 +16,12 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Ionicons from "react-native-vector-icons/Ionicons"
 import axios from "axios";
-import { requestCompanyInfoAPI } from "../../apis/companyAPI";
+import { requestCompanyInfoAPI } from "../../api-service/companyAPI";
 import getDirections from 'react-native-google-maps-directions'
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import CollapsingToolbar from "react-native-collapsingtoolbar/src";
 import { MAP_SCREEN, TASK_INFO_SCREEN, COMPANY_INFO_SCREEN } from "../../constants/screen";
-import { requestTaskDetailURL } from "../../apis/taskAPI";
+import { requestTaskDetailURL } from "../../api-service/taskAPI";
 
 export default class CompanyInfo extends Component {
   

@@ -11,7 +11,7 @@ import { Navigation } from "react-native-navigation";
 import { NOTIFICATION_SCREEN, TASK_INFO_SCREEN } from "../../constants/screen";
 import { GREEN } from "../../constants/common";
 import axios from "axios";
-import { updateNotification } from "../../apis/notificationAPI";
+import { updateNotification } from "../../api-service/notificationAPI";
 
 const styles = StyleSheet.create({
   notiInstance: {

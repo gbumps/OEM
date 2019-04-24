@@ -40,10 +40,10 @@ import {
   ERR_PHONE_NUMBER_NOT_FOUND_IOS
 } from "../../constants/alert";
 import axios from "axios";
-import { requestPhoneNumber, requestLoginURL } from "../../apis/loginAPI";
+import { requestPhoneNumber, requestLoginURL } from "../../api-service/loginAPI";
 import autobind from "class-autobind";
 import { baseColor } from "../../constants/mainSetting";
-import { requestAccountByPhoneNumber, requestUpdateUserInfo } from "../../apis/userAPI";
+import { requestAccountByPhoneNumber, requestUpdateUserInfo } from "../../api-service/userAPI";
 import renderBottomTab from "../../elements/bottomTab";
 import { Navigation } from "react-native-navigation";
 import firebase from "react-native-firebase";

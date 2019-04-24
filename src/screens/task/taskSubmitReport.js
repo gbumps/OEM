@@ -13,8 +13,8 @@ import { CheckBox  } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome"
 import { connect } from "react-redux";
 import { Navigation } from "react-native-navigation";
-import { uploadImageAPI } from "../../apis/uploadImageAPI";
-import { submitReportAPI, getReport } from "../../apis/reportAPI";
+import { uploadImageAPI } from "../../api-service/uploadImageAPI";
+import { submitReportAPI, getReport } from "../../api-service/reportAPI";
 import autobind from "class-autobind";
 import ImageInstance from "../../elements/imageInstance";
 import axios from "axios";

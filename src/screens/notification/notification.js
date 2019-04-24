@@ -8,7 +8,7 @@ import {
   RefreshControl, 
   ToastAndroid
 } from 'react-native';
-import { requestNotificationHistory } from "../../apis/notificationAPI";
+import { requestNotificationHistory } from "../../api-service/notificationAPI";
 import { Navigation } from "react-native-navigation";
 import axios from "axios";
 import Icon from 'react-native-vector-icons/FontAwesome';

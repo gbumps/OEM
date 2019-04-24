@@ -159,7 +159,7 @@ class TaskTodayView extends Component {
             <View style={styles.titleTodayTask}> 
               <View style={{flexDirection: "row"}}>
                 <AntDesign name="closecircle" size={25} color={RED}/>
-                <Text style={styles.title}> Đã vắng mặt </Text>
+                <Text style={styles.title}> Quá hạn </Text>
               </View>
               <View> 
                 <Badge status="primary" value={this.props.listTaskAbsent.length} 

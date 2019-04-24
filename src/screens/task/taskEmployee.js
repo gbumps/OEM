@@ -28,7 +28,7 @@ import {
   requestUpcomingTask, 
   requestCheckAttendanceForTask, 
   requestTaskByDateURL
-} from "../../apis/taskAPI";
+} from "../../api-service/taskAPI";
 import axios from "axios";
 import BackgroundTimer from "react-native-background-timer";
 import TaskTodayView from "./taskToday";

@@ -12,7 +12,7 @@ import { TOKEN, CONTENT_TYPE, AUTHORIZATION, USER, ZONE_TIME, RED, HOUR_FORMAT }
 import { COMPANY_INFO_SCREEN, MAP_SCREEN } from "../../constants/screen";
 
 import autobind from "class-autobind";
-import { requestTodayTaskLocation } from "../../apis/taskAPI";
+import { requestTodayTaskLocation } from "../../api-service/taskAPI";
 import moment from "moment";
 import axios from "axios";
 import { Navigation } from "react-native-navigation";

@@ -19,7 +19,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { USER, ROLE, TOKEN, CONTENT_TYPE, AUTHORIZATION, YES, NO, YELLOW_ORANGE, GREY, PHONENUMBER, SESSION_EXPIRE_TIME, BIRTHDAY, ADDRESS, MANAGER, PHONE_NUMBER_MANAGER } from "../../constants/common"
 import { DEVICE_WIDTH, baseColor } from "../../constants/mainSetting";
 import axios from "axios";
-import { requestUserInfoURL } from "../../apis/userAPI";
+import { requestUserInfoURL } from "../../api-service/userAPI";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import moment from "moment";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";

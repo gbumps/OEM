@@ -16,7 +16,7 @@ import axios from "axios";
 import { CHANGE_PASSWORD_SCREEN, LOGIN_SCREEN } from "../../constants/screen";
 import renderStatusBar from "../../elements/statusBar";
 import renderTopTab from "../../elements/topTab";
-import { requestLoginURL } from "../../apis/loginAPI";
+import { requestLoginURL } from "../../api-service/loginAPI";
 import { 
   ERR_WRONG_PASSWORD, 
   ERR_RETYPE_PASS_DONT_MATCH, 
@@ -27,7 +27,7 @@ import {
 } from "../../constants/alert";
 import { Navigation } from "react-native-navigation";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { requestUpdatePassword } from "../../apis/userAPI";
+import { requestUpdatePassword } from "../../api-service/userAPI";
 
 export default class ChangePassword extends Component {
    

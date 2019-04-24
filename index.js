@@ -25,7 +25,7 @@ import {
 } from "./src/constants/common";
 import firebase from "react-native-firebase";
 import { checkSession } from "./src/functions/functions";
-import { updateNotification } from "./src/apis/notificationAPI";
+import { updateNotification } from "./src/api-service/notificationAPI";
 import axios from "axios";
 
 registerScreen();
