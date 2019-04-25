@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -72,6 +71,7 @@
 		DC2DCCCA225C872400E5D7C2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DC2DCCA4225C872400E5D7C2 /* GoogleService-Info.plist */; };
 		E5C3735011914239924AC9D2 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BE954D5F04D04B208B08B82B /* Feather.ttf */; };
 		FE987505CC0C427CB5B316A5 /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 631CF93152EA48DEB917A9EE /* Lato-BoldItalic.ttf */; };
+		0A6E0EE6133543DB8D6B1125 /* libReactNativeFingerprintScanner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EABD4CBA515C4E5BB19BCBA5 /* libReactNativeFingerprintScanner.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -437,6 +437,8 @@
 		F8A3A9C099D04AB2A02734D6 /* RNiBeacon.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNiBeacon.xcodeproj; path = "../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon.xcodeproj"; sourceTree = "<group>"; };
 		F8DC0FCAC6C34F4497232BA8 /* Lato-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-BlackItalic.ttf"; path = "../src/assets/font/Lato-BlackItalic.ttf"; sourceTree = "<group>"; };
 		F9CCB355D1E8459BA6D5620C /* Lato-HairlineItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-HairlineItalic.ttf"; path = "../src/assets/font/Lato-HairlineItalic.ttf"; sourceTree = "<group>"; };
+		2C315FA5773947E888D6C59D /* ReactNativeFingerprintScanner.xcodeproj */ = {isa = PBXFileReference; name = "ReactNativeFingerprintScanner.xcodeproj"; path = "../node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		EABD4CBA515C4E5BB19BCBA5 /* libReactNativeFingerprintScanner.a */ = {isa = PBXFileReference; name = "libReactNativeFingerprintScanner.a"; path = "libReactNativeFingerprintScanner.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -468,6 +470,7 @@
 				5EDABE40B40E4B43B3DD33FC /* libRNiBeacon.a in Frameworks */,
 				3C669AC0B9E6403B856B91BE /* libRNExitApp.a in Frameworks */,
 				2E4F9CE6958646E28BC9BB64 /* libRNFirebase.a in Frameworks */,
+				0A6E0EE6133543DB8D6B1125 /* libReactNativeFingerprintScanner.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -668,6 +671,7 @@
 				F8A3A9C099D04AB2A02734D6 /* RNiBeacon.xcodeproj */,
 				D5AD1A304B0F431EA3A10700 /* RNExitApp.xcodeproj */,
 				A1111FC60F054A8CBC44D7FB /* RNFirebase.xcodeproj */,
+				2C315FA5773947E888D6C59D /* ReactNativeFingerprintScanner.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1509,12 +1513,14 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-fingerprint-scanner/ios",
 				);
 				INFOPLIST_FILE = OEMTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1538,12 +1544,14 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-fingerprint-scanner/ios",
 				);
 				INFOPLIST_FILE = OEMTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1570,6 +1578,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-fingerprint-scanner/ios",
 				);
 				INFOPLIST_FILE = OEM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1595,6 +1604,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-fingerprint-scanner/ios",
 				);
 				INFOPLIST_FILE = OEM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1625,11 +1635,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-fingerprint-scanner/ios",
 				);
 				INFOPLIST_FILE = "OEM-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1662,11 +1674,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-fingerprint-scanner/ios",
 				);
 				INFOPLIST_FILE = "OEM-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1698,11 +1712,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-fingerprint-scanner/ios",
 				);
 				INFOPLIST_FILE = "OEM-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1734,11 +1750,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-beacons-manager/ios/RNiBeacon/RNiBeacon",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-fingerprint-scanner/ios",
 				);
 				INFOPLIST_FILE = "OEM-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",

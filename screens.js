@@ -10,6 +10,7 @@ import CompanyInfo from "./src/screens/companyInfo/companyInfo";
 import ChangePassword from "./src/screens/changepass/changepass";
 import WaitingScreen from "./src/screens/waitingScreen/waitingScreen";
 import Maps from "./src/screens/maps/maps.js";
+import FingerprintScreen from "./src/screens/modalFingerprint/modalfingerprint";
 import { Provider } from "react-redux";
 import store from "./src/stores/store";
 import { registerComponent } from "./src/functions/functions";
@@ -88,4 +89,10 @@ export function registerScreen() {
     Provider, 
     store
   ); 
+  registerComponent(
+    screens.FINGERPRINT_SCREEN.settingName,
+    FingerprintScreen,
+    Provider,
+    store
+  )
 }

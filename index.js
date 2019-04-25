@@ -21,12 +21,14 @@ import {
   DISMISS,
   TASK_NOTIFICATION,
   CHANNEL_NOTIFICATION_OEM,
-  IC_LAUNCHER
+  IC_LAUNCHER,
+  SYSTEM_SOUND_STATE,
 } from "./src/constants/common";
 import firebase from "react-native-firebase";
 import { checkSession } from "./src/functions/functions";
 import { updateNotification } from "./src/api-service/notificationAPI";
 import axios from "axios";
+import { SOUND_NOTI_BTN } from "./src/constants/navBtn";
 
 registerScreen();
 
@@ -93,9 +95,11 @@ Navigation.setDefaultOptions({
 //when app start, set root screens
 Navigation.events().registerAppLaunchedListener(async() => {
   checkSession()
+  
+  //await AsyncStorage.setItem(SYSTEM_SOUND_STATE, "")
   const userId = await AsyncStorage.getItem(USER.ID),
         token  = await AsyncStorage.getItem(TOKEN) 
-  console.log('token: ', token)
+  //console.log('token: ', token)
   await AsyncStorage.multiRemove([
     TASK_REPORT_PROBLEM_TEMP, 
     TASK_IN_PROGRESS_TEMP_ID, 
@@ -119,10 +123,32 @@ Navigation.events().registerAppLaunchedListener(async() => {
       }
     })
   }
-
+  
   firebase.messaging().getToken().then(token => {
   })
 
+  const soundState = await AsyncStorage.getItem(SYSTEM_SOUND_STATE)
+  Navigation.mergeOptions(NOTIFICATION_SCREEN.id, {
+    topBar: {
+      rightButtons: [{
+        id: SOUND_NOTI_BTN,
+        icon: (soundState == "true") ? require("./src/assets/icon/speaker.png") : require("./src/assets/icon/speakerMute.png"),
+        color: baseColor
+      }]
+    }
+  })
+
+  // if (soundState == "true") {
+  //   axios({
+  //     url: requestTranslate,
+  //     method: "POST",
+  //     data: returnDataRequest(SOUND_CHECK_ATTENDANCE_SUCCESS)
+  //   }).then(t => {
+  //     const path = `${RNFS.DocumentDirectoryPath}/checkAttend.mp3`
+  //     RNFS.writeFile(path, t.data.audioContent, 'base64').then(() => playSound(path))
+  //   }).catch(err => console.log(err))
+  // } 
+  
   Navigation.events().registerBottomTabSelectedListener(({ unselectedTabIndex}) => {
     switch (unselectedTabIndex) {
       case 0:

@@ -36,9 +36,11 @@ import TaskUpcomingView from "./taskUpcoming";
 import firebase from "react-native-firebase";
 import { Navigation } from "react-native-navigation";
 import { TASK_SCREEN } from "../../constants/screen";
+import { requestTranslate } from "../../api-service/googleTranslateAPI";
+import { returnDataRequest, playSound } from "../../functions/functions";
+import RNFS from "react-native-fs";
 
 const YELLOW_ORANGE = "#ffa500"
-      
 
 class TaskEmployee extends Component {
  
@@ -119,7 +121,7 @@ class TaskEmployee extends Component {
 
   _activateBackgroundTimer() {
     BackgroundTimer.runBackgroundTimer(() => { 
-      //console.log('list task not start today: ', this.state.listTaskNotStartToday)
+      console.log('list task not start today: ', this.state.listTaskNotStartToday)
       if(typeof(this.state.listTaskNotStartToday !== undefined) &&
         this.state.listTaskNotStartToday.length !== 0) {
         this.state.listTaskNotStartToday.forEach((task) => {
@@ -367,9 +369,8 @@ class TaskEmployee extends Component {
                      firebase.notifications().scheduleNotification(localNoti, {
                        fireDate: date.getTime(),
                      })
-                   this._getTaskByDate
-                   Vibration.vibrate(700)
-                   //Alert.alert(NOTIFICATION, CHECK_ATTEND_SUCESSFUL)
+                   this._getTaskByDate()
+                   this._activateSound()
                })
                this.state.listCheckedAttendance.push(task)
                arrayWait.splice(index,1)
@@ -394,6 +395,20 @@ class TaskEmployee extends Component {
     console.log('gate closed')
     await Beacons.stopRangingBeaconsInRegion(commons.IBEACONS)
   }}
+
+  async _activateSound() {
+    const soundPermit = await AsyncStorage.getItem(commons.SYSTEM_SOUND_STATE)
+    if (soundPermit == true) {
+      axios({
+        url: requestTranslate,
+        method: "POST",
+        data: returnDataRequest(commons.SOUND_CHECK_ATTENDANCE_SUCCESS)
+      }).then(t => {
+        const path = `${RNFS.DocumentDirectoryPath}/checkAttend.mp3`
+        RNFS.writeFile(path, t.data.audioContent, 'base64').then(() => playSound(path))
+      }).catch(err => console.log(err))
+    }
+  }
 
   _renderTodayTask() {
     return(

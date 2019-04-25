@@ -70,6 +70,10 @@ export const CHANGE_PASSWORD_SCREEN = {
   vnName: "Đổi mật khẩu"
 }
 
+export const FINGERPRINT_SCREEN = {
+  settingName: "FINGERPRINT_SCREEN"
+}
+
 export const IMAGE_SCREEN= {
   settingName: "IMAGE_SCREEN",
 }

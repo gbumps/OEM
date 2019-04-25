@@ -14,6 +14,7 @@ import { baseColor } from "../constants/mainSetting";
 import moment from "moment";
 import { SESSION_EXPIRED, NOTIFICATION } from "../constants/alert";
 import { LOGIN_SCREEN } from "../constants/screen";
+import Sound from "react-native-sound";
 //register component to stack
 export function registerComponent(
   componentSetting, 
@@ -69,6 +70,35 @@ export const checkSession = async () => {
       })      
     }
 } 
+
+export const returnDataRequest = (text) => {
+  return {
+    "audioConfig": {
+      "audioEncoding": "MP3",
+      "pitch": 0,
+      "speakingRate": 1
+    },
+    "input": {
+      "text": text
+    },
+    "voice": {
+      "languageCode": "vi-VN",
+      "name": "vi-VN-Wavenet-A"
+    }
+  }
+}
+
+export const playSound = (path) => {
+  const s = new Sound(path, Sound.MAIN_BUNDLE,(err) => {
+      s.play((success) => {
+       if (success) {
+         console.log('successfully finished playing');
+       } else {
+         console.log('playback failed due to audio decoding errors');
+       }
+      })
+    }) 
+}
 
 //push modal 
 

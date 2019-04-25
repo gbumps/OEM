@@ -4,10 +4,14 @@ import android.app.Application;
 
 
 import com.github.wumke.RNExitApp.RNExitAppPackage;
+import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
+import com.oblador.keychain.KeychainPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 
+import com.rnfs.RNFSPackage;
+import com.zmxv.RNSound.RNSoundPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.mackentoch.beaconsandroid.BeaconsAndroidPackage;
@@ -51,8 +55,12 @@ public class MainApplication extends NavigationApplication {
 
         return Arrays.<ReactPackage>asList(
             // eg. new VectorIconsPackage()
+            new ReactNativeFingerprintScannerPackage(),
+                new KeychainPackage(),
+            new RNFSPackage(),
+            new RNSoundPackage(),
             new RNExitAppPackage(),
-                new RNDeviceInfo(),
+            new RNDeviceInfo(),
             new BackgroundTimerPackage(),
             new BeaconsAndroidPackage(),
             new RNFirebasePackage(),

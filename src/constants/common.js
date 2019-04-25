@@ -59,8 +59,10 @@ export const TASK_REPORT_PROBLEM_DESCRIPTION_TEMP = "TASK_REPORT_PROBLEM_DESCRIP
 export const TASK_REPORT_WORK_DESCRIPTION_TEMP = "TASK_REPORT_WORK_DESCRIPTION_TEMP"
 export const TASK_NOTIFICATION = "TASK_NOTIFICATION"
 export const SESSION_EXPIRE_TIME = "SESSION_EXPIRE_TIME"
+export const SYSTEM_SOUND_STATE = "SYSTEM_SOUND_STATE"
 export const END_TASK = "KẾT THÚC"
 export const REPORT_PROBLEM_NAME = "BÁO CÁO VẤN ĐỀ"
+export const PASSWORD = "PASSWORD"
 
 export const BEACON_DID_RANGE = "beaconsDidRange"
 export const IBEACONS = "iBeacons"
@@ -71,6 +73,10 @@ export const HELLO_WELCOME_TO_OEM = "Chào mừng đến với OEM"
 export const HELLO_INPUT_PASSWORD_TO_CONTINUE = "Đăng nhập để bắt đầu làm việc"
 export const HELLO_HAVE_A_NICE_DAY = "Chúc bạn có một ngày làm việc vui vẻ !"
 
+export const SOUND_CHECK_ATTENDANCE_SUCCESS = "Điểm danh thành công" 
+export const SOUND_NEW_TASK = "Bạn có công việc mới" 
+export const SOUND_TASK_EVALUATION = "Bạn có công việc đã được đánh giá" 
+
 export const listSuggestDescriptions = [
   "Tôi đã hoàn thành công việc",
   "Khác"
@@ -80,6 +86,7 @@ export const listSuggestDescriptionsProblem = [
   "Tôi có vấn đề này",
   "Khác"
 ]
+
 
 export const YELLOW_ORANGE = "#ffa500"
 export const GREY = "#afafaf"

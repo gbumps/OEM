@@ -1,9 +1,6 @@
 import React, { Component  } from "react";
 import { 
-  View, 
-  Text, 
   Modal,
-  StyleSheet,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform

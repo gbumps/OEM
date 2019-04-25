@@ -168,6 +168,10 @@ configurations.all {
 }
 
 dependencies {
+    implementation project(':react-native-sound')
+    implementation project(':react-native-fs')
+    implementation project(':react-native-keychain')
+    implementation project(':react-native-fingerprint-scanner')
     implementation project(':react-native-exit-app')
     implementation (project(':react-native-maps')){
        exclude group: 'com.google.android.gms', module: 'play-services-base'

@@ -6,8 +6,6 @@ import {
   StyleSheet
 } from 'react-native';
 import { Navigation } from "react-native-navigation";
-
-
 import { NOTIFICATION_SCREEN, TASK_INFO_SCREEN } from "../../constants/screen";
 import { GREEN } from "../../constants/common";
 import axios from "axios";

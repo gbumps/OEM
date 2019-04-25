@@ -16,7 +16,6 @@ import axios from "axios";
 import { CHANGE_PASSWORD_SCREEN, LOGIN_SCREEN } from "../../constants/screen";
 import renderStatusBar from "../../elements/statusBar";
 import renderTopTab from "../../elements/topTab";
-import { requestLoginURL } from "../../api-service/loginAPI";
 import { 
   ERR_WRONG_PASSWORD, 
   ERR_RETYPE_PASS_DONT_MATCH, 
@@ -28,7 +27,7 @@ import {
 import { Navigation } from "react-native-navigation";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { requestUpdatePassword } from "../../api-service/userAPI";
-
+import * as Keychain from "react-native-keychain";
 export default class ChangePassword extends Component {
    
   static get options() {
@@ -90,6 +89,7 @@ export default class ChangePassword extends Component {
         Alert.alert(NOTIFICATION,REQUIRE_RELOGIN,[],{
           onDismiss: async () => {
             await AsyncStorage.multiRemove([USER.ID, TOKEN, PHONENUMBER])
+            await Keychain.resetGenericPassword()
             await Navigation.setRoot({
                root: {
                  component: {

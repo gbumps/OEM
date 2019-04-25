@@ -6,7 +6,8 @@ import {
   ScrollView,
   AsyncStorage,
   RefreshControl, 
-  ToastAndroid
+  ToastAndroid,
+  Alert
 } from 'react-native';
 import { requestNotificationHistory } from "../../api-service/notificationAPI";
 import { Navigation } from "react-native-navigation";
@@ -24,11 +25,15 @@ import {
   GREY, YELLOW_ORANGE, 
   MINUTES_DAY, DEFAULT_PAGE_NOTIFICATION, 
   MAXIMUM_NOTIFICATION_UPDATE,
-  RED, 
+  RED,
+  SYSTEM_SOUND_STATE,
+  YES,
+  NO, 
 } from "../../constants/common";
 import { DEVICE_HEIGHT, baseColor } from "../../constants/mainSetting";
-import { ERR_INTERNET_CONNECTION, ERR_SERVER_ERROR } from "../../constants/alert";
+import { ERR_INTERNET_CONNECTION, ERR_SERVER_ERROR, CONFIRM, CONFIRM_TURN_OFF_SOUND, CONFIRM_TURN_ON_SOUND } from "../../constants/alert";
 import firebase from "react-native-firebase";
+import { SOUND_NOTI_BTN } from "../../constants/navBtn";
 
 class Notification extends Component {
  
@@ -80,6 +85,49 @@ class Notification extends Component {
          )
       }
     });
+  }
+
+  async navigationButtonPressed({buttonId}) {
+    if (buttonId == SOUND_NOTI_BTN){
+      const soundState = await AsyncStorage.getItem(SYSTEM_SOUND_STATE)
+      if (soundState == "true") {
+        Alert.alert(CONFIRM, CONFIRM_TURN_OFF_SOUND,[{
+          text: YES,
+          onPress: async () => {
+            await AsyncStorage.setItem(SYSTEM_SOUND_STATE, "false"),
+            Navigation.mergeOptions(NOTIFICATION_SCREEN.id, {
+              topBar: {
+                rightButtons: [{
+                  id: SOUND_NOTI_BTN,
+                  icon: require("../../assets/icon/speakerMute.png"),
+                  color: baseColor
+                }]
+              }
+            })
+          } 
+        },{
+          text: NO
+        }])
+      } else {
+        Alert.alert(CONFIRM,CONFIRM_TURN_ON_SOUND, [{
+          text: YES,
+          onPress: async () => {
+            await AsyncStorage.setItem(SYSTEM_SOUND_STATE, "true"),
+            Navigation.mergeOptions(NOTIFICATION_SCREEN.id, {
+              topBar: {
+                rightButtons: [{
+                  id: SOUND_NOTI_BTN,
+                  icon: require("../../assets/icon/speaker.png"),
+                  color: baseColor
+                }]
+              }
+            })
+          }  
+        }, {
+          text: NO
+        }])
+      }
+    }
   }
   
   _loadUnseenCountNotification() {

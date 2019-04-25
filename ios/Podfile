@@ -47,6 +47,14 @@ target 'OEM' do
 
   pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
 
+  pod 'TextToSpeech', :path => '../node_modules/react-native-tts'
+
+  pod 'RNKeychain', :path => '../node_modules/react-native-keychain'
+
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+
 end
 
 post_install do |installer|

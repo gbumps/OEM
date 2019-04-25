@@ -1,14 +1,15 @@
+import {AsyncStorage} from "react-native";
 import { 
   TASK_SCREEN,
   NOTIFICATION_SCREEN,
   OPTION_SCREEN,
-  EMPLOYEE_SCREEN,
   MAP_SCREEN
 } from "../constants/screen";
 import renderTopTab from "./topTab";
 import renderStatusBar from "./statusBar";
 import renderBottomTabIcon from "./bottomTabIcon";
-import { RED, GREEN } from "../constants/common";
+import { GREEN, SYSTEM_SOUND_STATE } from "../constants/common";
+import { baseColor } from "../constants/mainSetting";
 
 export default renderBottomTab = (passProp) => ({
     children: [{
@@ -64,7 +65,14 @@ export default renderBottomTab = (passProp) => ({
               name: NOTIFICATION_SCREEN.settingName,
               options: {
                 statusBar: renderStatusBar(true),
-                topBar: renderTopTab(NOTIFICATION_SCREEN), 
+                topBar: {
+                  ...renderTopTab(NOTIFICATION_SCREEN),
+                  rightButtons:[{
+                    id: "SOUND_NOTI_BTN",
+                    icon: require("../assets/icon/speaker.png"),
+                    color: baseColor
+                  }]
+                }, 
                 bottomTab: renderBottomTabIcon(NOTIFICATION_SCREEN),
               },
               passProps: passProp

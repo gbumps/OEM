@@ -11,19 +11,21 @@ import {
   AsyncStorage,
   ScrollView,
   Linking, 
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
 import { OPTION_SCREEN, LOGIN_SCREEN, CHANGE_PASSWORD_SCREEN } from "../../constants/screen";
 import { Navigation } from "react-native-navigation";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { USER, ROLE, TOKEN, CONTENT_TYPE, AUTHORIZATION, YES, NO, YELLOW_ORANGE, GREY, PHONENUMBER, SESSION_EXPIRE_TIME, BIRTHDAY, ADDRESS, MANAGER, PHONE_NUMBER_MANAGER } from "../../constants/common"
+import { USER, TOKEN, CONTENT_TYPE, AUTHORIZATION, YES, NO, YELLOW_ORANGE, GREY, PHONENUMBER, SESSION_EXPIRE_TIME, BIRTHDAY, ADDRESS, MANAGER, PHONE_NUMBER_MANAGER, SYSTEM_SOUND_STATE } from "../../constants/common"
 import { DEVICE_WIDTH, baseColor } from "../../constants/mainSetting";
 import axios from "axios";
 import { requestUserInfoURL } from "../../api-service/userAPI";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import moment from "moment";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import BackgroundTimer  from "react-native-background-timer";
+import autobind from "class-autobind";
 
 
 const Touchable = (props) => (
@@ -59,6 +61,7 @@ class Option extends Component {
        managerInfo: {}, 
        refreshing: false
     }
+    autobind(this)
   }
   
   
@@ -161,7 +164,7 @@ class Option extends Component {
                 text: YES, 
                 onPress: async () => {
                   BackgroundTimer.stopBackgroundTimer()
-                  await AsyncStorage.multiRemove([USER.ID, TOKEN,PHONENUMBER, SESSION_EXPIRE_TIME])
+                  await AsyncStorage.multiRemove([USER.ID, TOKEN,PHONENUMBER, SESSION_EXPIRE_TIME, SYSTEM_SOUND_STATE])
                   await Navigation.setRoot({
                      root: {
                        component: {

@@ -10,7 +10,7 @@ export const requestUpcomingTask = (employeeId, upcomingDate) =>
   `${baseURL}/task/get-upcoming-task/` + `${employeeId}?dateCurrentStr=` + `${upcomingDate}` 
 
 export const requestTodayTaskLocation = (employeeId) => 
-  `${baseURL}//task/get-today-locations?assigneeId=` + `${employeeId}`
+  `${baseURL}/task/get-today-locations?assigneeId=` + `${employeeId}`
 
 export const requestCheckAttendanceForTask = (taskId) => 
   `${baseURL}/task/check-attendance?taskId=` + `${taskId}`
