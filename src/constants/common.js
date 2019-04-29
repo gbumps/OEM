@@ -15,6 +15,7 @@ export const TIME_ATTENDANCE_AVAILABLE = 15
 export const REPORT_PROBLEM = 2
 export const REPORT_TASK = 1
 export const MINUTES_DAY = 1440
+export const TASK_OVERDUE = 3
 
 export const SEE_TASK = "Xem công việc"
 export const DISMISS = "Bỏ qua"

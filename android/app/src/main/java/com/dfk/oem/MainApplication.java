@@ -11,6 +11,7 @@ import com.airbnb.android.react.maps.MapsPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 
 import com.rnfs.RNFSPackage;
+import com.wenkesj.voice.VoicePackage;
 import com.zmxv.RNSound.RNSoundPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import org.reactnative.camera.RNCameraPackage;
@@ -55,6 +56,7 @@ public class MainApplication extends NavigationApplication {
 
         return Arrays.<ReactPackage>asList(
             // eg. new VectorIconsPackage()
+            new VoicePackage(),
             new ReactNativeFingerprintScannerPackage(),
                 new KeychainPackage(),
             new RNFSPackage(),

@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AntDesign from "react-native-vector-icons/AntDesign";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { TASK_SCREEN, TASK_INFO_SCREEN } from "../../constants/screen";
-import { ABSENT } from "../../constants/common";
+import { ABSENT, TASK_OVERDUE } from "../../constants/common";
 import { DEVICE_WIDTH } from "../../constants/mainSetting";
 import { fetchBaseColor } from "../../functions/functions";
 
@@ -61,7 +61,7 @@ export default TaskItem = (props) => (
      style={
        [styles.taskInfo, { 
        borderLeftWidth: 7, 
-       borderLeftColor: (props.attendance === ABSENT) ? 
+       borderLeftColor: (props.attendance === ABSENT || props.status === TASK_OVERDUE) ? 
          "#f43030" : fetchBaseColor(props.status)}]}
      onPress={() => 
         Navigation.push(
@@ -77,7 +77,7 @@ export default TaskItem = (props) => (
        })}>
      <View>
        <Text style={[styles.taskTitleText, {
-         color: (props.attendance === ABSENT) ? 
+         color: (props.attendance === ABSENT || props.status === TASK_OVERDUE) ? 
          "#f43030" : fetchBaseColor(props.status)
        }]}>
          {props.id + " - " + props.title}

@@ -36,7 +36,7 @@ import TaskUpcomingView from "./taskUpcoming";
 import firebase from "react-native-firebase";
 import { Navigation } from "react-native-navigation";
 import { TASK_SCREEN } from "../../constants/screen";
-import { requestTranslate } from "../../api-service/googleTranslateAPI";
+import { requestTextToSpeechAPI } from "../../api-service/googleTranslateAPI";
 import { returnDataRequest, playSound } from "../../functions/functions";
 import RNFS from "react-native-fs";
 
@@ -193,9 +193,8 @@ class TaskEmployee extends Component {
           listTaskInProgress: this._loadListTaskByStatus(commons.TASK_IN_PROGRESS, res.data),
           listTaskCompleted: this._loadListTaskByStatus(commons.TASK_COMPLETED, res.data),
           listTaskPendingApproval: this._loadListTaskByStatus(commons.TASK_WAITING_FOR_APPROVE, res.data),
-          listTaskAbsent: res.data.filter(t => t.attendanceStatus === commons.ABSENT)
+          listTaskAbsent: this._loadListTaskByStatus(commons.TASK_OVERDUE, res.data).concat(res.data.filter(t => t.attendanceStatus === commons.ABSENT))
         })
-        
       }).catch(err => {
         //console.log("err at get today task: ", err)
         ToastAndroid.showWithGravity(ERR_SERVER_ERROR, ToastAndroid.SHORT,ToastAndroid.BOTTOM)
@@ -381,10 +380,6 @@ class TaskEmployee extends Component {
            this._removeTaskCheckedAttendance()
          }
        })
-      //console.log('Enter beacon check !')
-      //console.log(`Beacons ranging started succesfully!`)
-      //DeviceEventEmitter.removeAllListeners
-     // console.log('done start gate')
     } catch (err) {
       console.log(`Beacons ranging not started, error: ${error}`)
       console.log('da dong gate list wait empty')
@@ -400,7 +395,7 @@ class TaskEmployee extends Component {
     const soundPermit = await AsyncStorage.getItem(commons.SYSTEM_SOUND_STATE)
     if (soundPermit == true) {
       axios({
-        url: requestTranslate,
+        url: requestTextToSpeechAPI(),
         method: "POST",
         data: returnDataRequest(commons.SOUND_CHECK_ATTENDANCE_SUCCESS)
       }).then(t => {
@@ -475,7 +470,7 @@ class TaskEmployee extends Component {
           alwaysBounceVertical={true}
           contentContainerStyle={styles.scrollViewContainer}>
             {
-             (this.state.selectedIndex === 0) ? 
+              (this.state.selectedIndex === 0) ? 
               this._renderTodayTask() 
                : 
               this._renderUpcomingTask()

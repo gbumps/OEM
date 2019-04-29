@@ -73,17 +73,17 @@ export const checkSession = async () => {
 
 export const returnDataRequest = (text) => {
   return {
-    "audioConfig": {
-      "audioEncoding": "MP3",
-      "pitch": 0,
-      "speakingRate": 1
+    audioConfig: {
+      audioEncoding: "MP3",
+      pitch: 0,
+      speakingRate: 1
     },
-    "input": {
-      "text": text
+    input: {
+      text: text
     },
-    "voice": {
-      "languageCode": "vi-VN",
-      "name": "vi-VN-Wavenet-A"
+    voice: {
+      languageCode: "vi-VN",
+      name: "vi-VN-Wavenet-A"
     }
   }
 }

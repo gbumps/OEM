@@ -1,1 +1,3 @@
-export const requestTranslate = "https://cxl-services.appspot.com/proxy?url=https://texttospeech.googleapis.com/v1beta1/text:synthesize&token=03AOLTBLSrxpZ_9R9s-YgPHQX2nW_5KaINr5z7Ppmn3snoAXl7lPTgKKUJ5tEaTFNAmS2Fs1u9CdXb-NxHpQR4cPHnPAN8a96WipgKTLD-WgzfBPa5-gqP63py7lzHhLX42lPLHqY9lOSfik711gSORkIINGjLHK_KeyLsKbXv28g6s3KrlR5zN38H3hRh4y6UhjdlIF2z7Ca01tugsRMwe2QPTmHx7OS-aExh3c2KcIN52MOJupn_WgOOeQzcNARzduGEu1HE-1UAcho3HUn-a5X11t0wDdV1UUADG_o5JxCjtPfdcXZBsAMURimPuTHTkbu_9OQo8OdF"
+const API_key = "AIzaSyDfsSJxZrSSPRlN04lZxx7JxqV-NuotAjQ"
+export const requestTextToSpeechAPI = () => `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=` +`${API_key}`
+export const requestSpeechToTextAPI = () => `https://speech.googleapis.com/v1p1beta1/speech:recognize?key=` + `${API_key}`

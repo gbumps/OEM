@@ -50,7 +50,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 
 const CheckBoxInstance = (props) => (
   <View style={styles.checkBoxContainerStyle}>
-  <CheckBox
+    <CheckBox
       title={props.title}
       checkedIcon='check-square'
       uncheckedIcon='square'
@@ -58,8 +58,8 @@ const CheckBoxInstance = (props) => (
       containerStyle={styles.checkBox}
       checked={props.checkState}
       onPress={props.onPress}
-  /> 
-  <Image source={{uri: props.imageSource}} style={styles.checkBoxImage} />
+    /> 
+    <Image source={{uri: props.imageSource}} style={styles.checkBoxImage} />
   </View>
 )
 
@@ -86,6 +86,7 @@ class TaskInfo extends Component {
       task: {},
       checkList: [],
       status: 0,
+      showAttendanceStatus: "none",
       showImageWorkplace: "none", 
       showDescription: "none", 
       descriptionReports: "",
@@ -142,6 +143,7 @@ class TaskInfo extends Component {
         case commons.TASK_COMPLETED:
         case commons.TASK_NOT_START:
         case commons.TASK_WAITING_FOR_APPROVE: 
+        case commons.TASK_OVERDUE:
           this.setState({
             submitCompleteBtn: "none"
           })
@@ -222,6 +224,7 @@ class TaskInfo extends Component {
               case commons.TASK_COMPLETED:
               case commons.TASK_NOT_START:
               case commons.TASK_WAITING_FOR_APPROVE: 
+              case commons.TASK_OVERDUE:
                 return;
             } 
             if (this.state.task.attendanceStatus === commons.ABSENT) {
@@ -244,7 +247,8 @@ class TaskInfo extends Component {
   }
 
   _handleLoadImage(list) {
-    if (list.length == 0) {
+    //console.log("list image: ", list)
+    if (list[0] === "" && list.length === 1) {
       return (<Text style={{color: commons.RED, ...styles.title}}>Không có hình ảnh</Text>) 
     }
     return (
@@ -307,10 +311,10 @@ class TaskInfo extends Component {
     if (this.state.task.rating === null) {
       return l
     }
-    for (var i = 0; i < this.state.task.rating;i++) {
+    for (var i = 0; i < this.state.task.rating; i++) {
       l.push(<FontAwesome name="star" size={25} color={commons.YELLOW_ORANGE} style={{padding: 10}}/>)
     }
-    for (var i = 0;i < 5 - this.state.task.rating; i++) {
+    for (var i = 0; i < 5 - this.state.task.rating; i++) {
       l.push(<FontAwesome name="star-o" size={25} color={commons.YELLOW_ORANGE} style={{padding: 10}}/>)
     }
     return l
@@ -350,6 +354,19 @@ class TaskInfo extends Component {
       }
   }
 
+  _renderColorTimeAttendance(status) {
+    switch(status) {
+      case 0: 
+      return commons.GREY
+      case 1: 
+      return commons.GREEN
+      case 2: 
+      return commons.YELLOW_ORANGE
+      case 3: 
+      return commons.RED 
+    }
+  }
+
 
   //render the full view of task detail
   _renderTaskDetailView(taskDetail) {
@@ -372,7 +389,7 @@ class TaskInfo extends Component {
       return (
       <View style={{flex: 1}}>
         <Text style={[styles.taskName, {
-          color:  (taskDetail.attendanceStatus === commons.ABSENT) ? 
+          color:  (taskDetail.attendanceStatus === commons.ABSENT || taskDetail.status === commons.TASK_OVERDUE) ? 
           "#f43030" : fetchBaseColor(this.state.task.status)}]}>
           {taskDetail.id + " - " + taskDetail.title}
         </Text>
@@ -394,6 +411,11 @@ class TaskInfo extends Component {
                taskDetail.workplace.picture }}
             style={{width: DEVICE_WIDTH, height: 200}}/>
         </View>
+        <TouchableOpacity onPress={() => {
+          this.setState({
+            showAttendanceStatus: this.state.showAttendanceStatus === "none" ? "flex" : "none"
+          })
+        }}>
         <View style={[styles.titleContainer, { justifyContent: "space-between" }] }>
           <View style={{ flexDirection: "row" }}>
             <FontAwesome5 name="calendar-check" size={25} color={commons.GREEN} />
@@ -407,9 +429,11 @@ class TaskInfo extends Component {
             value={this._renderAttendanceStatus(taskDetail.attendanceStatus).value}
             status={this._renderAttendanceStatus(taskDetail.attendanceStatus).color}/>
         </View>
-        <View style={[styles.titleContainer]}> 
-          <Text style={[styles.title, {color: commons.YELLOW_ORANGE}]}>
-            {moment(taskDetail.checkInTime).format("HH:mm DD/MM/YYYY")}
+        </TouchableOpacity>
+        <View style={[styles.titleContainer, {display: this.state.showAttendanceStatus, flexDirection: "column"}]}> 
+          <Text style={{paddingLeft: 40, fontSize: 17}}>Điểm danh vào lúc</Text>
+          <Text style={[styles.title, {paddingLeft: 40, color: this._renderColorTimeAttendance(taskDetail.attendanceStatus)}]}>
+           {moment(taskDetail.checkInTime).format("HH:mm DD/MM/YYYY")} 
           </Text>
         </View> 
         <TouchableOpacity onPress={ this.handleGetDirections }>
@@ -592,6 +616,7 @@ class TaskInfo extends Component {
             <View style={{height: DEVICE_HEIGHT - 55}}>
             <View style={{height: DEVICE_HEIGHT - 100}}>
               <CollapsingToolbar 
+                title={this.state.task.zoneName}
                 leftItem={<Ionicons name="md-arrow-round-back" size={25} color={baseColor} />}
                 leftItemPress={() => {
                   this._handlePop()

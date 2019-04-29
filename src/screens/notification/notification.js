@@ -100,7 +100,7 @@ class Notification extends Component {
                 rightButtons: [{
                   id: SOUND_NOTI_BTN,
                   icon: require("../../assets/icon/speakerMute.png"),
-                  color: baseColor
+                  color: RED
                 }]
               }
             })

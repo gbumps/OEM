@@ -3,20 +3,23 @@ import {
   View, 
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  ToastAndroid,
   ScrollView,
   TextInput,
   Alert,
   AsyncStorage,
   StyleSheet,
  } from "react-native";
-import { CheckBox  } from "react-native-elements";
+import { CheckBox } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome"
 import { connect } from "react-redux";
 import { Navigation } from "react-native-navigation";
 import { uploadImageAPI } from "../../api-service/uploadImageAPI";
-import { submitReportAPI, getReport } from "../../api-service/reportAPI";
+import { submitReportAPI } from "../../api-service/reportAPI";
 import autobind from "class-autobind";
 import ImageInstance from "../../elements/imageInstance";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import axios from "axios";
 import { 
   CAMERA_SCREEN, 
@@ -29,7 +32,7 @@ import {
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/mainSetting";
 import * as commons from "../../constants/common"; 
 import * as alerts from "../../constants/alert";
-
+import Voice from "react-native-voice";
 const GREEN = "#00a86a"
 
 
@@ -37,21 +40,63 @@ class TaskSubmitReport extends Component {
  
  constructor(props) {
    super(props)
-   this.state={
-     taskId: "",
-     imgUris: [], 
-     description: "",
-     reportType: "",
-     taskCheckList: [],
-     reportFunctionsView: "flex",
-     listSuggestDescriptionCheck: [true, false, false]
-   }
-  //  this._submitReport = this._submitReport.bind(this)
-  //  this._handleSubmitReport = this._handleSubmitReport.bind(this)
-   autobind(this)        //bind all methods except some component lifecycle
+    this.state={
+      taskId: "",
+      imgUris: [], 
+      audioUris:"",
+      description: "",
+      reportType: "",
+      taskCheckList: [],
+      reportFunctionsView: "flex",
+      recordStatus: false,
+      listSuggestDescriptionCheck: [true, false, false]
+    }
+    Voice.onSpeechStart = this.onSpeechStart;
+    Voice.onSpeechRecognized = this.onSpeechRecognized;
+    Voice.onSpeechEnd = this.onSpeechEnd;
+    Voice.onSpeechError = this.onSpeechError;
+    Voice.onSpeechResults = this.onSpeechResults;
+    Voice.onSpeechPartialResults = this.onSpeechPartialResults;
+    Voice.onSpeechVolumeChanged = this.onSpeechVolumeChanged;
+   autobind(this) 
  }
   
- componentDidUpdate(prevProps) { //update 
+ onSpeechStart = e => {
+  // eslint-disable-next-line
+  console.log('onSpeechStart: ', e);
+};
+
+onSpeechRecognized = e => {
+  // eslint-disable-next-line
+  console.log('onSpeechRecognized: ', e);
+};
+
+onSpeechEnd = async (e) => {
+  // eslint-disable-next-line
+  console.log('onSpeechEnd: ', e);
+  this.setState({
+    recordStatus: false
+  })
+  await Voice.stop()
+  await Voice.destroy()
+};
+
+onSpeechError = e => {
+  // eslint-disable-next-line
+  console.log('onSpeechError: ', e.error);
+};
+
+onSpeechPartialResults = e => {
+  // eslint-disable-next-line
+  console.log('onSpeechPartialResults: ', e.value);
+  
+    this.setState({
+      description: e.value[e.value.length - 1]
+    })
+  
+};
+
+  componentDidUpdate(prevProps) { //update 
     if (this.props.imageUriReport !== prevProps.imageUriReport) {
       this.state.imgUris.push(this.props.imageUriReport)
       this.setState({
@@ -115,7 +160,7 @@ class TaskSubmitReport extends Component {
       taskCheckList: taskCheckList
     })
   }
-  
+
   _createFormData(uri) { 
       const formData = new FormData();
       formData.append('dataFile', {
@@ -224,6 +269,31 @@ class TaskSubmitReport extends Component {
      }
   }
 
+
+  async _activateAudioRecord(){
+    if (!this.state.recordStatus) {
+      console.log("start recording...")
+      try{
+        await Voice.start('vi-VN')
+        this.setState({
+          recordStatus: true
+        })
+        //ToastAndroid.show("")
+      }catch (err) {
+        console.log("err at record start: ", err)
+      }
+   } 
+   else {
+      console.log("stop recording...")
+      this.setState({
+        recordStatus: false  
+      }) 
+      setTimeout(async () => Voice.stop(),200)
+      await Voice.destroy()
+   }
+  }
+  
+
    _handleSubmitReport() {
     if (this.state.imgUris.length === 0) {
       Alert.alert(alerts.NOTIFICATION, alerts.MIN_FILE_LIMIT)
@@ -262,20 +332,27 @@ class TaskSubmitReport extends Component {
     }
    }
   
-
   render() {
-    
     return( 
       <View style={styles.container}>
-        <TextInput style={styles.textDescription}
-          onChangeText={(text) => {
-            this.setState({
-              description: text
-            })
-          }}
-          value={this.state.description}
-          placeholder={commons.PLACEHOLDER_DESCRIPTION}
-        />
+        <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around"}}>
+          <TextInput style={styles.textDescription}
+            onChangeText={(text) => {
+              this.setState({
+                description: text
+              })
+            }}
+            value={this.state.description}
+            placeholder={commons.PLACEHOLDER_DESCRIPTION}
+          />
+          <TouchableOpacity onPress={this._activateAudioRecord}>
+            {
+              (this.state.recordStatus) ? 
+              <FontAwesome5 name="microphone" color={GREEN} size={30}/> :
+              <FontAwesome5 name="microphone" color={commons.GREY} size={30}/> 
+            }
+          </TouchableOpacity>
+        </View>
         <View> 
           {
             (this.state.reportType === 1 ? 
