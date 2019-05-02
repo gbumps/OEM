@@ -22,16 +22,11 @@ import {
   TASK_NOTIFICATION,
   CHANNEL_NOTIFICATION_OEM,
   IC_LAUNCHER,
-  SYSTEM_SOUND_STATE,
-  RED,
 } from "./src/constants/common";
 import firebase from "react-native-firebase";
-import { checkSession, returnDataRequest, playSound } from "./src/functions/functions";
+import { checkSession } from "./src/functions/functions";
 import { updateNotification } from "./src/api-service/notificationAPI";
 import axios from "axios";
-import { SOUND_NOTI_BTN } from "./src/constants/navBtn";
-import RNFS from "react-native-fs";
-import { requestTextToSpeechAPI } from "./src/api-service/googleTranslateAPI";
 
 registerScreen();
 
@@ -101,7 +96,7 @@ Navigation.events().registerAppLaunchedListener(async() => {
   //await AsyncStorage.setItem(SYSTEM_SOUND_STATE, "")
   const userId = await AsyncStorage.getItem(USER.ID),
         token  = await AsyncStorage.getItem(TOKEN) 
-  //console.log('token: ', token)
+  console.log('token: ', token)
   await AsyncStorage.multiRemove([
     TASK_REPORT_PROBLEM_TEMP, 
     TASK_IN_PROGRESS_TEMP_ID, 
@@ -129,18 +124,6 @@ Navigation.events().registerAppLaunchedListener(async() => {
   firebase.messaging().getToken().then(token => {
   })
 
-  const soundState = await AsyncStorage.getItem(SYSTEM_SOUND_STATE)
-  Navigation.mergeOptions(NOTIFICATION_SCREEN.id, {
-    topBar: {
-      rightButtons: [{
-        id: SOUND_NOTI_BTN,
-        icon: (soundState == "true") ? require("./src/assets/icon/speaker.png") : require("./src/assets/icon/speakerMute.png"),
-        color: (soundState == "true") ? baseColor : RED
-      }]
-    }
-  })
-
-  
   Navigation.events().registerBottomTabSelectedListener(({ unselectedTabIndex}) => {
     switch (unselectedTabIndex) {
       case 0:
@@ -187,23 +170,6 @@ Navigation.events().registerAppLaunchedListener(async() => {
     //phone vibrate 700 ms
     Vibration.vibrate(700)
     const { title, body } = notification;
-    //console.log('notification: ',notification)
-    const notificationSoundStatus = await AsyncStorage.getItem(SYSTEM_SOUND_STATE)
-    if (notificationSoundStatus === "true") {
-      console.log("sound activate !")
-      axios({
-        url: requestTextToSpeechAPI(),
-        method: "POST",
-        data: returnDataRequest(title),
-        headers: {
-          Authorization: "", 
-          "Content-Type": "application/json"
-        }
-      }).then(t => {
-        const path = `${RNFS.DocumentDirectoryPath}/sound.mp3`
-        RNFS.writeFile(path, t.data.audioContent, 'base64').then(() => playSound(path))
-      }).catch(err => console.log(err))
-    } 
     Alert.alert(title, body, [
       {
         text: SEE_TASK,

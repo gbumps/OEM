@@ -3,8 +3,7 @@ import {
   View, 
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  ToastAndroid,
+  PermissionsAndroid,
   ScrollView,
   TextInput,
   Alert,
@@ -38,63 +37,74 @@ const GREEN = "#00a86a"
 
 class TaskSubmitReport extends Component {
  
- constructor(props) {
-   super(props)
-    this.state={
-      taskId: "",
-      imgUris: [], 
-      audioUris:"",
-      description: "",
-      reportType: "",
-      taskCheckList: [],
-      reportFunctionsView: "flex",
-      recordStatus: false,
-      listSuggestDescriptionCheck: [true, false, false]
+  constructor(props) {
+    super(props)
+     this.state={
+       taskId: "",
+       imgUris: [], 
+       audioUris:"",
+       description: "",
+       reportType: "",
+       taskCheckList: [],
+       partialWord: "",
+       reportFunctionsView: "flex",
+       recordStatus: false,
+       listSuggestDescriptionCheck: [true, false, false]
+     }
+     Voice.onSpeechStart = this.onSpeechStart;
+     Voice.onSpeechRecognized = this.onSpeechRecognized;
+     Voice.onSpeechEnd = this.onSpeechEnd;
+     Voice.onSpeechError = this.onSpeechError;
+     Voice.onSpeechResults = this.onSpeechResults;
+     Voice.onSpeechPartialResults = this.onSpeechPartialResults;
+     Voice.onSpeechVolumeChanged = this.onSpeechVolumeChanged;
+    autobind(this) 
+  }
+ 
+  onSpeechStart = e => {
+    // eslint-disable-next-line
+    console.log('onSpeechStart: ', e);
+  };
+
+  onSpeechRecognized = e => {
+    // eslint-disable-next-line
+    console.log('onSpeechRecognized: ', e);
+  }
+
+  onSpeechEnd = async (e) => {
+    // eslint-disable-next-line
+    console.log('onSpeechEnd: ', e);
+    // this.setState({
+    //   recordStatus: false
+    // })
+    //await Voice.stop()
+    //await Voice.destroy()
+  }
+
+  onSpeechError = e => {
+    // eslint-disable-next-line
+    console.log('onSpeechError: ', e.error);
+  }
+
+  onSpeechPartialResults = e => {
+    // eslint-disable-next-line
+    if (e.value[0] !== "") {
+      let t = Array.from(e.value[0].split(" "))
+      console.log("t: ",t)
+      let newPartial = t[t.length - 1]
+      console.log("new partial: ", newPartial)
+      if (this.state.partialWord !== newPartial)
+      this.setState({ 
+        description: this.state.description + " " + newPartial,
+        partialWord: newPartial
+      })
     }
-    Voice.onSpeechStart = this.onSpeechStart;
-    Voice.onSpeechRecognized = this.onSpeechRecognized;
-    Voice.onSpeechEnd = this.onSpeechEnd;
-    Voice.onSpeechError = this.onSpeechError;
-    Voice.onSpeechResults = this.onSpeechResults;
-    Voice.onSpeechPartialResults = this.onSpeechPartialResults;
-    Voice.onSpeechVolumeChanged = this.onSpeechVolumeChanged;
-   autobind(this) 
- }
-  
- onSpeechStart = e => {
-  // eslint-disable-next-line
-  console.log('onSpeechStart: ', e);
-};
+    
+  }
 
-onSpeechRecognized = e => {
-  // eslint-disable-next-line
-  console.log('onSpeechRecognized: ', e);
-};
-
-onSpeechEnd = async (e) => {
-  // eslint-disable-next-line
-  console.log('onSpeechEnd: ', e);
-  this.setState({
-    recordStatus: false
-  })
-  await Voice.stop()
-  await Voice.destroy()
-};
-
-onSpeechError = e => {
-  // eslint-disable-next-line
-  console.log('onSpeechError: ', e.error);
-};
-
-onSpeechPartialResults = e => {
-  // eslint-disable-next-line
-  console.log('onSpeechPartialResults: ', e.value);
-  
-    this.setState({
-      description: e.value[e.value.length - 1]
-    })
-  
-};
+  onSpeechResults = e => {
+    console.log('onSpeechResult: ', e.value)
+  }
 
   componentDidUpdate(prevProps) { //update 
     if (this.props.imageUriReport !== prevProps.imageUriReport) {
@@ -236,9 +246,9 @@ onSpeechPartialResults = e => {
         Navigation.dismissAllModals()
         Alert.alert(alerts.NOTIFICATION, alerts.UPDATE_TASK_FAILED)
     })
-   }
+  }
 
-   _handlePressCamera() { 
+  _handlePressCamera() { 
       if (this.state.imgUris.length === 6) {
         Alert.alert(alerts.NOTIFICATION, alerts.MAX_FILE_LIMIT)
         return;
@@ -250,9 +260,9 @@ onSpeechPartialResults = e => {
           action: "report"
         }
       }
-    })}
+  })}
 
-    _handlePop() {
+  _handlePop() {
      switch(this.props.navigateFrom) {
       case TASK_SCREEN.id:
         Navigation.popToRoot(TASK_SCREEN.id,{})
@@ -266,35 +276,49 @@ onSpeechPartialResults = e => {
       //case commons.TASK_NOTIFICATION: 
       //  Navigation.dismissAllModals()
       //  break
-     }
+    }
   }
-
 
   async _activateAudioRecord(){
-    if (!this.state.recordStatus) {
-      console.log("start recording...")
-      try{
-        await Voice.start('vi-VN')
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        {
+          title: 'Cho phép ứng dụng ghi âm',
+          message: 'Để nhận diện giọng nói, bạn phải cho phép ứng dụng ghi âm',
+          buttonPositive: "Tiếp tục"
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        if (!this.state.recordStatus) {
+          console.log("start recording...")
+          try {
+            Voice.start('vi-VN')
+            this.setState({
+              recordStatus: true
+            })
+            //ToastAndroid.show("")
+          } catch (err) {
+            console.log("err at record start: ", err)
+          }
+       } 
+       else {
+        console.log("stop recording...")
         this.setState({
-          recordStatus: true
-        })
-        //ToastAndroid.show("")
-      }catch (err) {
-        console.log("err at record start: ", err)
+          recordStatus: false  
+        }) 
+        setTimeout(async () => await Voice.stop(),200)
+        //await Voice.destroy()
+       }
+      } else {
+        Alert.alert(alerts.ERR, "Bạn phải cho phép ứng dụng truy cập micro trước !")
       }
-   } 
-   else {
-      console.log("stop recording...")
-      this.setState({
-        recordStatus: false  
-      }) 
-      setTimeout(async () => Voice.stop(),200)
-      await Voice.destroy()
-   }
+    } catch (err) {
+      console.warn(err);
+    }
   }
-  
 
-   _handleSubmitReport() {
+  _handleSubmitReport() {
     if (this.state.imgUris.length === 0) {
       Alert.alert(alerts.NOTIFICATION, alerts.MIN_FILE_LIMIT)
       return;
@@ -344,6 +368,8 @@ onSpeechPartialResults = e => {
             }}
             value={this.state.description}
             placeholder={commons.PLACEHOLDER_DESCRIPTION}
+            multiline={true}
+            allowFontScaling={false}
           />
           <TouchableOpacity onPress={this._activateAudioRecord}>
             {
@@ -462,7 +488,8 @@ const styles = StyleSheet.create({
   }, 
   textDescription: {
     marginLeft: 15,
-    fontSize: 20
+    fontSize: 20, 
+    maxWidth: DEVICE_WIDTH - 150
   }
 })
 

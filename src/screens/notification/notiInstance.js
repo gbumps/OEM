@@ -33,30 +33,7 @@ export default Noti = (props) => (
     style={[styles.notiInstance,{
        borderLeftWidth: (props.seen) ? 0 : 5, 
        borderLeftColor: (props.seen) ?  'none' : GREEN 
-    }]} onPress={ 
-      () => { 
-        Navigation.push(NOTIFICATION_SCREEN.id, {
-          component: {
-            id: TASK_INFO_SCREEN.id,
-            name: TASK_INFO_SCREEN.settingName,
-            passProps: {
-               taskId: props.taskId,
-               navigateFrom: NOTIFICATION_SCREEN.id, 
-            }
-          }
-        })
-        if (!props.seen) { 
-          axios({ 
-            url: updateNotification(props.notiId),
-            method: "PUT",
-            data:{
-              key: "seen",
-              value: true
-            },
-          })
-        }
-      }
-    }>
+    }]} onPress={props.onPress}>
       <View style={{flexDirection: "row", justifyContent: "space-between"}}> 
         <Text style={styles.titleNotification}>{props.title}</Text>
         <Text style={styles.titleNotification}>{props.time}</Text>

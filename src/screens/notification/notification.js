@@ -9,7 +9,7 @@ import {
   ToastAndroid,
   Alert
 } from 'react-native';
-import { requestNotificationHistory } from "../../api-service/notificationAPI";
+import { requestNotificationHistory, updateNotification } from "../../api-service/notificationAPI";
 import { Navigation } from "react-native-navigation";
 import axios from "axios";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -17,7 +17,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import autobind from "class-autobind";
 import Noti from "./notiInstance";
 import moment from "moment";
-import { NOTIFICATION_SCREEN } from "../../constants/screen";
+import { NOTIFICATION_SCREEN, TASK_INFO_SCREEN } from "../../constants/screen";
 import {
   CONTENT_TYPE, 
   AUTHORIZATION, 
@@ -26,14 +26,10 @@ import {
   MINUTES_DAY, DEFAULT_PAGE_NOTIFICATION, 
   MAXIMUM_NOTIFICATION_UPDATE,
   RED,
-  SYSTEM_SOUND_STATE,
-  YES,
-  NO, 
 } from "../../constants/common";
-import { DEVICE_HEIGHT, baseColor } from "../../constants/mainSetting";
-import { ERR_INTERNET_CONNECTION, ERR_SERVER_ERROR, CONFIRM, CONFIRM_TURN_OFF_SOUND, CONFIRM_TURN_ON_SOUND } from "../../constants/alert";
+import { DEVICE_HEIGHT } from "../../constants/mainSetting";
+import { ERR_INTERNET_CONNECTION, ERR_SERVER_ERROR } from "../../constants/alert";
 import firebase from "react-native-firebase";
-import { SOUND_NOTI_BTN } from "../../constants/navBtn";
 
 class Notification extends Component {
  
@@ -87,49 +83,6 @@ class Notification extends Component {
     });
   }
 
-  async navigationButtonPressed({buttonId}) {
-    if (buttonId == SOUND_NOTI_BTN){
-      const soundState = await AsyncStorage.getItem(SYSTEM_SOUND_STATE)
-      if (soundState == "true") {
-        Alert.alert(CONFIRM, CONFIRM_TURN_OFF_SOUND,[{
-          text: YES,
-          onPress: async () => {
-            await AsyncStorage.setItem(SYSTEM_SOUND_STATE, "false"),
-            Navigation.mergeOptions(NOTIFICATION_SCREEN.id, {
-              topBar: {
-                rightButtons: [{
-                  id: SOUND_NOTI_BTN,
-                  icon: require("../../assets/icon/speakerMute.png"),
-                  color: RED
-                }]
-              }
-            })
-          } 
-        },{
-          text: NO
-        }])
-      } else {
-        Alert.alert(CONFIRM,CONFIRM_TURN_ON_SOUND, [{
-          text: YES,
-          onPress: async () => {
-            await AsyncStorage.setItem(SYSTEM_SOUND_STATE, "true"),
-            Navigation.mergeOptions(NOTIFICATION_SCREEN.id, {
-              topBar: {
-                rightButtons: [{
-                  id: SOUND_NOTI_BTN,
-                  icon: require("../../assets/icon/speaker.png"),
-                  color: baseColor
-                }]
-              }
-            })
-          }  
-        }, {
-          text: NO
-        }])
-      }
-    }
-  }
-  
   _loadUnseenCountNotification() {
     firebase.notifications().onNotification((notification) => {
     this.setState({
@@ -214,6 +167,32 @@ class Notification extends Component {
     return time + " ngày"
   }
 
+  _handleNotificationPressed(status, taskId, notiId) {
+    Navigation.push(NOTIFICATION_SCREEN.id, {
+      component: {
+        id: TASK_INFO_SCREEN.id,
+        name: TASK_INFO_SCREEN.settingName,
+        passProps: {
+           taskId: taskId,
+           navigateFrom: NOTIFICATION_SCREEN.id, 
+        }
+      }
+    })
+    if (!status) { 
+      this.setState({
+        unseenCount: this.state.unseenCount - 1
+      })
+      axios({ 
+        url: updateNotification(notiId),
+        method: "PUT",
+        data:{
+          key: "seen",
+          value: true
+        },
+      })
+    }
+  }
+
   _renderNoti(list) {
     let newNotis = [], oldNotis = []
     var today = moment(new Date())
@@ -243,6 +222,7 @@ class Notification extends Component {
               }
               description={list[key].message} 
               seen={list[key].seen} 
+              onPress={() => this._handleNotificationPressed(list[key].seen, list[key].taskId, list[key].id)}
             />
         if (!list[key].seen || 
           today.diff(moment(list[key].dateCreate) ,"minutes") < MINUTES_DAY) {

@@ -26,6 +26,7 @@ import moment from "moment";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import BackgroundTimer  from "react-native-background-timer";
 import autobind from "class-autobind";
+import { LOG_OUT, CONFIRM_LOG_OUT } from "../../constants/alert";
 
 
 const Touchable = (props) => (
@@ -160,7 +161,7 @@ class Option extends Component {
             field="Đăng xuất"
             text={""}
             onPress={() => 
-            Alert.alert('Đăng xuất', 'Bạn có muốn đăng xuất ?',[{
+            Alert.alert(LOG_OUT, CONFIRM_LOG_OUT,[{
                 text: YES, 
                 onPress: async () => {
                   BackgroundTimer.stopBackgroundTimer()

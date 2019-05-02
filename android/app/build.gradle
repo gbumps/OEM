@@ -96,7 +96,7 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-
+    
     defaultConfig {
         applicationId "com.dfk.oem"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -168,6 +168,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation project(':react-native-bluetooth-status')
     implementation project(':react-native-voice')
     implementation project(':react-native-sound')
     implementation project(':react-native-fs')

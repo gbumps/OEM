@@ -77,6 +77,7 @@ export const HELLO_HAVE_A_NICE_DAY = "Chúc bạn có một ngày làm việc vu
 export const SOUND_CHECK_ATTENDANCE_SUCCESS = "Điểm danh thành công" 
 export const SOUND_NEW_TASK = "Bạn có công việc mới" 
 export const SOUND_TASK_EVALUATION = "Bạn có công việc đã được đánh giá" 
+export const GO_TO_SETTING = "Đi tới cài đặt"
 
 export const listSuggestDescriptions = [
   "Tôi đã hoàn thành công việc",

@@ -28,6 +28,7 @@ export const REQUIRE_FIELD_VALIDATOR = "Yêu cầu nhập đầy đủ thông ti
 export const REQUIRE_RELOGIN = "Đổi mật khẩu thành công, yêu cầu đăng nhập lại !"
 export const REQUEST_LOCATION_TURN_ON = "Bật vị trí để cải thiện định vị trên bản đồ và điểm danh"
 export const CHECK_IN_SUCCESS = "Điểm danh thành công !"
+export const BLUETOOTH_NOT_TURNED_ON = "Để điểm danh, vui lòng bật Bluetooth và Vị trí"
 
 export const SESSION_EXPIRED = "Phiên đã hết hạn, vui lòng đăng nhập lại !"
 export const CONFIRM = "Xác nhận"
@@ -37,3 +38,6 @@ export const CONFIRM_SUBMIT_PROBLEM = "Bạn chắc chắn muốn nộp báo cá
 export const CONFIRM_TURN_ON_SOUND = "Bật phát âm khi có thông báo mới ?"
 export const CONFIRM_TURN_OFF_SOUND = "Tắt phát âm khi có thông báo mới ?"
 export const ACCESS_CAMERA = "Bắt buộc truy nhập vào camera để sử dụng được tính năng này"
+
+export const LOG_OUT = "Đăng xuất"
+export const CONFIRM_LOG_OUT = "Bạn có muốn đăng xuất ?"

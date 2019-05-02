@@ -59,6 +59,10 @@ target 'OEM' do
 
   pod 'rn-fetch-blob', :path => '../node_modules/rn-fetch-blob'
 
+  pod 'react-native-bluetooth-status', :path => '../node_modules/react-native-bluetooth-status'
+
+  pod 'RCTSystemSetting', :path => '../node_modules/react-native-system-setting'
+
 end
 
 post_install do |installer|

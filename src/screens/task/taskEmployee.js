@@ -9,9 +9,10 @@ import {
   DeviceEventEmitter,
   RefreshControl,
   NetInfo,
-  Vibration,
   ToastAndroid, 
-  DatePickerAndroid
+  DatePickerAndroid,
+  Alert,
+  Linking
 } from 'react-native';
 import moment from "moment";
 import { ButtonGroup } from "react-native-elements";
@@ -21,7 +22,9 @@ import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSett
 import { 
   CHECK_ATTEND_SUCESSFUL,  
   ERR_SERVER_ERROR, 
-  CHECK_IN_SUCCESS 
+  CHECK_IN_SUCCESS, 
+  NOTIFICATION,
+  BLUETOOTH_NOT_TURNED_ON
 } from "../../constants/alert";
 import autobind from "class-autobind";
 import { 
@@ -38,8 +41,8 @@ import { Navigation } from "react-native-navigation";
 import { TASK_SCREEN } from "../../constants/screen";
 import { requestTextToSpeechAPI } from "../../api-service/googleTranslateAPI";
 import { returnDataRequest, playSound } from "../../functions/functions";
+import { BluetoothStatus } from 'react-native-bluetooth-status';
 import RNFS from "react-native-fs";
-
 const YELLOW_ORANGE = "#ffa500"
 
 class TaskEmployee extends Component {
@@ -70,6 +73,16 @@ class TaskEmployee extends Component {
     }
     autobind(this)
   }
+   
+  async _checkBluetoothAndLocationService() {
+    const isEnable = await BluetoothStatus.state()
+    if (!isEnable) {
+      Alert.alert(NOTIFICATION, BLUETOOTH_NOT_TURNED_ON,[{
+        text: commons.GO_TO_SETTING,
+        onPress:()=> Linking.openURL("settings:")
+      }])
+    }
+  }
 
   async componentDidMount() {
     this.navigationEventListener = Navigation.events().bindComponent(this);
@@ -83,11 +96,11 @@ class TaskEmployee extends Component {
        this._getTaskByDate()
     })
     Navigation.events().registerCommandListener((name, params) => {
-      //console.log("name: ", name)
       if (name === "popTo" && params.componentId === TASK_SCREEN.id) {
         this._getTaskByDate()
       }
-    });
+    })
+    this._checkBluetoothAndLocationService()
   }
 
   navigationButtonPressed({ buttonId }) {
@@ -132,8 +145,7 @@ class TaskEmployee extends Component {
         }) 
       console.log('list wait',this.state.listWaitCheckAttendance)
       this._checkGateStatus()
-      }
-    }, 10000); //10 secs 
+    }}, 10000); //10 secs 
   }
 
   async _openDatePicker() {
@@ -217,16 +229,16 @@ class TaskEmployee extends Component {
   }
 
   _returnEachDataForTimeLine(task) {
-  return {
-    time: moment(task.startTime).format(HOUR_FORMAT) + "\n" + moment(task.endTime).format(HOUR_FORMAT), 
-    title: task.title, 
-    id: task.id,
-    description: "Mô tả: " + task.description,
-    workplaceName: task.workplaceName,
-    companyDTO: task.companyDTO.name,
-    circleColor: '#009688',
-    imageUrl: task.companyDTO.picture 
-  }
+    return {
+      time: moment(task.startTime).format(HOUR_FORMAT) + "\n" + moment(task.endTime).format(HOUR_FORMAT), 
+      title: task.title, 
+      id: task.id,
+      description: "Mô tả: " + task.description,
+      workplaceName: task.workplaceName,
+      companyDTO: task.companyDTO.name,
+      circleColor: '#009688',
+      imageUrl: task.companyDTO.picture 
+    }
 }
 
   _getUpcomingTask() {
