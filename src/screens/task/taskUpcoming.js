@@ -81,8 +81,8 @@ export default class TaskUpcomingView extends Component {
             <Text style={[styles.title]}>{rowData.title}</Text>
             <Text style={{color: baseColor, fontSize: 18, fontWeight: "bold"}}>{rowData.workplaceName}</Text>
             <Text style={{color: RED, fontSize: 16, fontWeight: "bold"}}>{
-              rowData.companyDTO.length >= 15 ? 
-              rowData.companyDTO.substring(0,15) + "..." :
+              rowData.companyDTO.length >= 7 ? 
+              rowData.companyDTO.substring(0,7) + "..." :
               rowData.companyDTO 
             }</Text>
             <Text style={{fontSize: 13}}>{rowData.description}</Text>

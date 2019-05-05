@@ -47,8 +47,8 @@ class TaskTodayView extends Component {
           key={list[key].id}
           id={list[key].id}
           title={
-            (list[key].title.length >= 16) ? 
-                list[key].title.substring(0,15) + "..." :
+            (list[key].title.length >= 6) ? 
+                list[key].title.substring(0,6) + "..." :
                 list[key].title
           }
           imageCompany={list[key].companyDTO.picture}

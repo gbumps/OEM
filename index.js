@@ -27,6 +27,7 @@ import firebase from "react-native-firebase";
 import { checkSession } from "./src/functions/functions";
 import { updateNotification } from "./src/api-service/notificationAPI";
 import axios from "axios";
+import { CHECK_ATTEND_SUCESSFUL } from "./src/constants/alert";
 
 registerScreen();
 
@@ -170,34 +171,39 @@ Navigation.events().registerAppLaunchedListener(async() => {
     //phone vibrate 700 ms
     Vibration.vibrate(700)
     const { title, body } = notification;
-    Alert.alert(title, body, [
-      {
-        text: SEE_TASK,
-        onPress: () => {
-          axios({ 
-            url: updateNotification(notification.data.notify_id),
-            method: "PUT",
-            data:{
-              key: "seen",
-              value: true
-            },
-          })
-          Navigation.showModal({
-            component: {
-              name: TASK_INFO_SCREEN.settingName,
-              passProps: {
-                taskId: notification.data.task_id,
-                navigateFrom: TASK_NOTIFICATION,
+    if (title == CHECK_ATTEND_SUCESSFUL) {
+      Alert.alert(title, body) 
+    }
+    else {
+      Alert.alert(title, body, [
+        {
+          text: SEE_TASK,
+          onPress: () => {
+            axios({ 
+              url: updateNotification(notification.data.notify_id),
+              method: "PUT",
+              data:{
+                key: "seen",
+                value: true
+              },
+            })
+            Navigation.showModal({
+              component: {
+                name: TASK_INFO_SCREEN.settingName,
+                passProps: {
+                  taskId: notification.data.task_id,
+                  navigateFrom: TASK_NOTIFICATION,
+                }
               }
-            }
-          })
+            })
+          }
+        },{
+          text: DISMISS, 
+          onPress:() => {
+             console.log("User canceled pressed !")
+          }
         }
-      },{
-        text: DISMISS, 
-        onPress:() => {
-           console.log("User canceled pressed !")
-        }
-      }
-    ])
+      ])
+    }
   })
 })

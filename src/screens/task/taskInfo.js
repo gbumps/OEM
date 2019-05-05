@@ -1,52 +1,28 @@
-import React,{ Component } from "react";
-import { connect  } from "react-redux";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  AsyncStorage,
-  ScrollView,
-  ProgressBarAndroid
-} from 'react-native';
-import { CheckBox, Badge } from "react-native-elements";
-import { 
-  TASK_INFO_SCREEN, 
-  TASK_REPORT_SCREEN, 
-  TASK_REPORT_PROBLEM_SCREEN,
-  TASK_SCREEN,
-  COMPANY_INFO_SCREEN,
-  NOTIFICATION_SCREEN,
-} from "../../constants/screen";
-import renderStatusBar from "../../elements/statusBar";
-import renderBottomTabIcon from "../../elements/bottomTabIcon";
+import axios from "axios";
+import autobind from "class-autobind";
+import moment from "moment";
+import React, { Component } from "react";
+import { Alert, AsyncStorage, Image, ProgressBarAndroid, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CollapsingToolbar from 'react-native-collapsingtoolbar';
-import { DEVICE_WIDTH, baseColor, DEVICE_HEIGHT } from "../../constants/mainSetting";
+import { Badge, CheckBox } from "react-native-elements";
+import getDirections from 'react-native-google-maps-directions';
 import { Navigation } from "react-native-navigation";
-import Icon from "react-native-vector-icons/FontAwesome"
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { default as FontAwesome, default as Icon } from "react-native-vector-icons/FontAwesome";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import getDirections from 'react-native-google-maps-directions'
-import { fetchBaseColor } from "../../functions/functions";
-import moment from "moment";
-import * as commons from "../../constants/common";
-import axios from "axios";
-import { requestTaskDetailURL } from "../../api-service/taskAPI";
-import { 
-  ERR_TASK_NOT_START, 
-  NOTIFICATION, 
-  ERR_TASK_OVERDUE, 
-  ERR_TASK_COMPLETED,
-  ERR_REPORT_PROBLEM_ALREADY_SUBMITTED
-} from "../../constants/alert";
-import autobind from "class-autobind";
-import ImageInstance from "../../elements/imageInstance";
+import { connect } from "react-redux";
 import { getReport } from "../../api-service/reportAPI";
-import AntDesign from "react-native-vector-icons/AntDesign";
+import { requestTaskDetailURL } from "../../api-service/taskAPI";
+import { ERR_REPORT_PROBLEM_ALREADY_SUBMITTED, ERR_TASK_COMPLETED, ERR_TASK_NOT_START, ERR_TASK_OVERDUE, NOTIFICATION } from "../../constants/alert";
+import * as commons from "../../constants/common";
+import { baseColor, DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/mainSetting";
+import { COMPANY_INFO_SCREEN, NOTIFICATION_SCREEN, TASK_INFO_SCREEN, TASK_REPORT_PROBLEM_SCREEN, TASK_REPORT_SCREEN, TASK_SCREEN } from "../../constants/screen";
+import renderBottomTabIcon from "../../elements/bottomTabIcon";
+import ImageInstance from "../../elements/imageInstance";
+import renderStatusBar from "../../elements/statusBar";
+import { fetchBaseColor } from "../../functions/functions";
 
 const CheckBoxInstance = (props) => (
   <View style={styles.checkBoxContainerStyle}>
@@ -386,6 +362,7 @@ class TaskInfo extends Component {
       const workTime = this._calculateWorkTime(taskDetail.startTime,taskDetail.endTime),
             workDate = new Date(taskDetail.startTime.replace("+0000", "Z"))
        
+      //console.log("task check in time: ", taskDetail.checkInTime)
       return (
       <View style={{flex: 1}}>
         <Text style={[styles.taskName, {
@@ -433,7 +410,9 @@ class TaskInfo extends Component {
         <View style={[styles.titleContainer, {display: this.state.showAttendanceStatus, flexDirection: "column"}]}> 
           <Text style={{paddingLeft: 40, fontSize: 17}}>Điểm danh vào lúc</Text>
           <Text style={[styles.title, {paddingLeft: 40, color: this._renderColorTimeAttendance(taskDetail.attendanceStatus)}]}>
-           {moment(taskDetail.checkInTime).format("HH:mm DD/MM/YYYY")} 
+           {
+             (taskDetail.checkInTime == null) ? "Chưa điểm danh":
+             moment(taskDetail.checkInTime).format("HH:mm DD/MM/YYYY")} 
           </Text>
         </View> 
         <TouchableOpacity onPress={ this.handleGetDirections }>
@@ -604,6 +583,7 @@ class TaskInfo extends Component {
       <ProgressBarAndroid animating={true}/>
     </View> : 
       <View style={{flex: 1}}>
+      
         {
           (this.state.status === 500) ?
            <View style={styles.errLoadInfoTask}>
@@ -613,7 +593,7 @@ class TaskInfo extends Component {
               </Text>
            </View>
             : 
-            <View style={{height: DEVICE_HEIGHT - 55}}>
+            <View style={{height: DEVICE_HEIGHT - 70}}>
             <View style={{height: DEVICE_HEIGHT - 100}}>
               <CollapsingToolbar 
                 title={this.state.task.zoneName}

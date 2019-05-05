@@ -77,10 +77,7 @@ class TaskEmployee extends Component {
   async _checkBluetoothAndLocationService() {
     const isEnable = await BluetoothStatus.state()
     if (!isEnable) {
-      Alert.alert(NOTIFICATION, BLUETOOTH_NOT_TURNED_ON,[{
-        text: commons.GO_TO_SETTING,
-        onPress:()=> Linking.openURL("settings:")
-      }])
+      Alert.alert(NOTIFICATION, BLUETOOTH_NOT_TURNED_ON)
     }
   }
 
@@ -230,7 +227,7 @@ class TaskEmployee extends Component {
 
   _returnEachDataForTimeLine(task) {
     return {
-      time: moment(task.startTime).format(HOUR_FORMAT) + "\n" + moment(task.endTime).format(HOUR_FORMAT), 
+      time: moment(task.startTime).format(commons.HOUR_FORMAT) + "\n" + moment(task.endTime).format(commons.HOUR_FORMAT), 
       title: task.title, 
       id: task.id,
       description: "Mô tả: " + task.description,
